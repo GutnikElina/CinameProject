@@ -1,12 +1,10 @@
 package Admin.SessionActions;
 
 import Utils.AppUtils;
-import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,70 +16,55 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetAllSessions extends Application {
-
-    private ListView<String> sessionsListView;
+public class GetAllSessions {
+    @FXML
+    private ListView<String> listView;
+    @FXML
     private Button backButton;
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Все сеансы");
+    private String command = "SESSION;GET_ALL;";
 
-        sessionsListView = new ListView<>();
-        sessionsListView.setPrefHeight(300);
-
-        backButton = new Button("Назад");
-
-        backButton.setAlignment(Pos.CENTER);
-        backButton.setOnAction(e -> primaryStage.close());
-
-        VBox root = new VBox(20);
-        root.setPadding(new Insets(20));
-        root.getChildren().addAll(sessionsListView, backButton);
-
-        fetchAllSessions();
-
-        Scene scene = new Scene(root, 800, 500);
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
-        primaryStage.setScene(scene);
-        primaryStage.show();
+    @FXML
+    private void initialize() {
+        fetchAllItems();
+        backButton.setOnAction(e -> handleBackButton());
     }
 
-    private void fetchAllSessions() {
-        String message = "SESSION;GET_ALL;";
-
+    private void fetchAllItems() {
         try (Socket socket = new Socket("localhost", 12345);
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-            out.println(message);
+            out.println(command);
 
+            List<String> items = new ArrayList<>();
             String response;
-            List<String> sessions = new ArrayList<>();
             while ((response = in.readLine()) != null) {
                 if (response.equals("END_OF_SESSIONS")) {
                     break;
                 }
-                if (response.startsWith("SESSION_FOUND;")) {
-                    String[] sessionData = response.split(";");
-                    String movieTitle = sessionData[2];
-                    String hallName = sessionData[3];
-                    String startTime = formatDateTime(sessionData[4]);
-                    String endTime = formatDateTime(sessionData[5]);
-
-                    sessions.add(String.format("Фильм: %s\nЗал: %s\nНачало: %s\nКонец: %s",
-                            movieTitle, hallName, startTime, endTime));
+                if (isValidResponse(response)) {
+                    items.add(formatItemResponse(response));
                 } else if (response.startsWith("ERROR;")) {
-                    AppUtils.showAlert("Ошибка", "Не удалось получить данные о сеансах.", Alert.AlertType.ERROR);
-                    break;
+                    handleError("Не удалось получить данные.");
                 }
             }
-            updateSessionsListView(sessions);
+            updateListView(items);
 
         } catch (IOException e) {
-            AppUtils.showAlert("Ошибка", "Не удалось получить данные о сеансах.", Alert.AlertType.ERROR);
-            e.printStackTrace();
+            handleError("Не удалось получить данные.");
         }
+    }
+
+    private boolean isValidResponse(String response) {
+        return response.startsWith("SESSION_FOUND;");
+    }
+
+    private String formatItemResponse(String response) {
+        String[] sessionData = response.split(";");
+        return String.format("ID: %s\nФильм: %s\nЗал: %s\nНачало: %s\nКонец: %s",
+                sessionData[1], sessionData[2], sessionData[3],
+                formatDateTime(sessionData[4]), formatDateTime(sessionData[5]));
     }
 
     private String formatDateTime(String dateTime) {
@@ -94,16 +77,22 @@ public class GetAllSessions extends Application {
         }
     }
 
-    private void updateSessionsListView(List<String> sessions) {
-        sessionsListView.getItems().clear();
-        if (sessions.isEmpty()) {
-            sessionsListView.getItems().add("Нет сеансов.");
+    private void updateListView(List<String> items) {
+        listView.getItems().clear();
+        if (items.isEmpty()) {
+            listView.getItems().add("Нет доступных сеансов.");
         } else {
-            sessionsListView.getItems().addAll(sessions);
+            listView.getItems().addAll(items);
         }
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    @FXML
+    private void handleBackButton() {
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.close();
+    }
+
+    private void handleError(String message) {
+        AppUtils.showAlert("Ошибка", message, Alert.AlertType.ERROR);
     }
 }

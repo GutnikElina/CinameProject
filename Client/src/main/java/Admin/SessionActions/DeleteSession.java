@@ -51,8 +51,12 @@ public class DeleteSession extends Application {
             if (response.startsWith("SUCCESS")) {
                 UIUtils.showAlert("Успех", "Сеанс удален", Alert.AlertType.INFORMATION);
                 stage.close();
+            } else if (response.equals("SESSION_NOT_FOUND")) {
+                UIUtils.showAlert("Ошибка", "Сеанс с таким ID не найден", Alert.AlertType.ERROR);
+                stage.close();
             } else {
                 UIUtils.showAlert("Ошибка", "Не удалось удалить сеанс: " + response, Alert.AlertType.ERROR);
+                stage.close();
             }
 
         } catch (NumberFormatException e) {

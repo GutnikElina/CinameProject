@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="500.0" prefWidth="800.0" spacing="20" style="-fx-background-color: #8d85a6;" xmlns="http://javafx.com/javafx/17.0.13" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Admin.SessionActions.GetAllSessions">
+    <HBox prefHeight="400.0" prefWidth="775.0">
+        <ListView fx:id="listView" prefHeight="338.0" prefWidth="800">
+         <HBox.margin>
+            <Insets left="30.0" right="30.0" top="30.0" />
+         </HBox.margin></ListView>
+    </HBox>
+    <HBox prefHeight="100.0" prefWidth="200.0">
+        <Button fx:id="backButton" onAction="#handleBackButton" prefHeight="33.0" prefWidth="151.0" styleClass="button" text="Назад">
+          <HBox.margin>
+              <Insets left="330.0" />
+          </HBox.margin>
+          <font>
+              <Font name="Segoe UI Semibold" size="15.0" />
+          </font>
+        </Button>
+    </HBox>
+</VBox>

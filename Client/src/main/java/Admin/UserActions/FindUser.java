@@ -1,47 +1,29 @@
 package Admin.UserActions;
 
+import Admin.GeneralActions.UserActionBase;
 import Models.User;
 import Utils.AppUtils;
 import Utils.UIUtils;
 import Utils.FieldValidator;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
 import java.time.LocalDateTime;
 
 public class FindUser extends UserActionBase {
 
+    @FXML
     private TextField userIdField;
+    @FXML
     private Label usernameLabel, roleLabel, createdAtLabel;
+    @FXML
+    private Button backButton;
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Информация о пользователе");
-
-        userIdField = UIUtils.createTextField("Введите ID пользователя");
-        Button fetchButton = UIUtils.createButton("Получить данные", 150, e -> fetchUserDetails(), false);
-
-        usernameLabel = createDetailLabel();
-        roleLabel = createDetailLabel();
-        createdAtLabel = createDetailLabel();
-
-        GridPane detailsPane = new GridPane();
-        detailsPane.setVgap(10);
-        detailsPane.add(new Label("Имя пользователя:"), 0, 0);
-        detailsPane.add(usernameLabel, 1, 0);
-        detailsPane.add(new Label("Роль:"), 0, 1);
-        detailsPane.add(roleLabel, 1, 1);
-        detailsPane.add(new Label("Дата создания:"), 0, 2);
-        detailsPane.add(createdAtLabel, 1, 2);
-
-        VBox root = new VBox(20, userIdField, fetchButton, detailsPane);
-        Scene scene = new Scene(root, 800, 500);
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
+    @FXML
     private void fetchUserDetails() {
         if (!FieldValidator.validateNumericField(userIdField, "Введите корректный ID пользователя!")) {
             return;
@@ -69,9 +51,9 @@ public class FindUser extends UserActionBase {
         createdAtLabel.setText(user.getCreatedAt().toString());
     }
 
-    private Label createDetailLabel() {
-        Label label = new Label();
-        label.getStyleClass().add("search-label");
-        return label;
+    @FXML
+    private void handleBackButton() {
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.close();
     }
 }

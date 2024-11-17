@@ -4,6 +4,8 @@ import Utils.AppUtils;
 import Utils.ResponseProcessor;
 import Utils.UIUtils;
 import javafx.scene.control.Alert;
+import javafx.stage.Stage;
+
 import java.io.*;
 import java.net.Socket;
 

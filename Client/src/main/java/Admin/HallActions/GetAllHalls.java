@@ -1,11 +1,10 @@
 package Admin.HallActions;
 
 import Utils.AppUtils;
-import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,77 +14,76 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetAllHalls extends Application {
-
-    private ListView<String> hallsListView;
+public class GetAllHalls {
+    @FXML
+    private ListView<String> listView;
+    @FXML
     private Button backButton;
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Все залы");
+    private String command = "HALL;GET_ALL;";
 
-        hallsListView = new ListView<>();
-        hallsListView.setPrefHeight(300);
-
-        backButton = new Button("Назад");
-        backButton.setOnAction(e -> primaryStage.close());
-
-        VBox root = new VBox(20);
-        root.setPadding(new Insets(20));
-        root.getChildren().addAll(hallsListView, backButton);
-
+    @FXML
+    private void initialize() {
         fetchAllHalls();
-
-        Scene scene = new Scene(root, 800, 500);
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        backButton.setOnAction(e -> handleBackButton());
     }
 
     private void fetchAllHalls() {
-        String message = "HALL;GET_ALL;";
-
         try (Socket socket = new Socket("localhost", 12345);
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-            out.println(message);
+            out.println(command);
 
             String response;
             List<String> halls = new ArrayList<>();
             while ((response = in.readLine()) != null) {
-                if (response.equals("END_OF_HALLS")) {
+                if (response.startsWith("END")) {
                     break;
                 }
-                if (response.startsWith("HALL_FOUND;")) {
-                    String[] hallData = response.split(";");
-                    int hallId = Integer.parseInt(hallData[1]);
-                    String hallName = hallData[2];
-                    int capacity = Integer.parseInt(hallData[3]);
-                    halls.add("ID: " + hallId + " - " + hallName + " (Вместимость: " + capacity + ")");
+                if (isValidResponse(response)) {
+                    halls.add(formatItemResponse(response));
                 } else if (response.startsWith("ERROR;")) {
-                    AppUtils.showAlert("Ошибка", "Не удалось получить данные о залах.", Alert.AlertType.ERROR);
+                    handleError("Не удалось получить данные.");
                     break;
                 }
             }
-            updateHallsListView(halls);
+            updateListView(halls);
 
         } catch (IOException e) {
-            AppUtils.showAlert("Ошибка", "Не удалось получить данные о залах.", Alert.AlertType.ERROR);
+            handleError("Не удалось получить данные.");
             e.printStackTrace();
         }
     }
 
-    private void updateHallsListView(List<String> halls) {
-        hallsListView.getItems().clear();
-        if (halls.isEmpty()) {
-            hallsListView.getItems().add("Нет доступных залов.");
+    private boolean isValidResponse(String response) {
+        return response.startsWith("HALL_FOUND;");
+    }
+
+    private String formatItemResponse(String response) {
+        String[] hallData = response.split(";");
+        int hallId = Integer.parseInt(hallData[1]);
+        String hallName = hallData[2];
+        int capacity = Integer.parseInt(hallData[3]);
+        return "ID: " + hallId + " - " + hallName + " (Вместимость: " + capacity + ")";
+    }
+
+    private void updateListView(List<String> items) {
+        listView.getItems().clear();
+        if (items.isEmpty()) {
+            listView.getItems().add("Нет доступных залов.");
         } else {
-            hallsListView.getItems().addAll(halls);
+            listView.getItems().addAll(items);
         }
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    @FXML
+    private void handleBackButton() {
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.close();
+    }
+
+    private void handleError(String message) {
+        AppUtils.showAlert("Ошибка", message, Alert.AlertType.ERROR);
     }
 }

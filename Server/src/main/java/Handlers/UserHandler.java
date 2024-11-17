@@ -1,6 +1,7 @@
 package Handlers;
 
 import Models.User;
+import Services.AuthService;
 import Services.UserService;
 import lombok.AllArgsConstructor;
 
@@ -37,6 +38,13 @@ public class UserHandler extends EntityHandler<User> {
 
         try {
             int userId = Integer.parseInt(requestParts[2]);
+            User existingUser = userService.getById(userId);
+
+            if (existingUser == null) {
+                sendError(out, "Пользователь с таким ID не найден");
+                return;
+            }
+
             User user = new User(requestParts[3], requestParts[4]);
             user.setRole(requestParts[5]);
             user.setId(userId);
@@ -56,10 +64,15 @@ public class UserHandler extends EntityHandler<User> {
 
         try {
             int userId = Integer.parseInt(requestParts[2]);
-            userService.delete(userId);
-            out.println("USER_DELETED");
+            User user = userService.getById(userId);
+            if (user != null) {
+                userService.delete(userId);
+                out.println("USER_DELETED");
+            } else {
+                out.println("USER_NOT_FOUND");
+            }
         } catch (Exception e) {
-            sendError(out, "Ошибка при удалении пользователя");
+            sendError(out, "Ошибка при удалении пользователя: " + e.getMessage());
         }
     }
 
@@ -89,7 +102,7 @@ public class UserHandler extends EntityHandler<User> {
             if (users.isEmpty()) {
                 sendError(out, "Пользователи не найдены");
             } else {
-                users.forEach(user -> out.println("USER_FOUND;" + user.getId() + ";" + user.getUsername()));
+                users.forEach(user -> out.println("USER_FOUND;" + user.getId() + ";" + user.getUsername() + ";" + user.getRole() + ";" + user.getCreatedAt()));
                 out.println("END_OF_USERS");
             }
         } catch (Exception e) {

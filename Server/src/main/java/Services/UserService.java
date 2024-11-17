@@ -13,7 +13,14 @@ public class UserService extends BaseService implements Repository<User> {
 
     @Override
     public void update(User user) {
-        executeTransaction(session -> session.merge(user));
+        executeTransaction(session -> {
+            User existingUser = session.get(User.class, user.getId());
+            if (existingUser != null) {
+                session.merge(user);
+            } else {
+                throw new IllegalArgumentException("Пользователь с таким ID не существует");
+            }
+        });
     }
 
     @Override

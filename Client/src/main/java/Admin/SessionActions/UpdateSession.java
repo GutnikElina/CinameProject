@@ -124,8 +124,9 @@ public class UpdateSession extends Application {
                 formattedStartTime, formattedEndTime);
 
         String response = AppUtils.sendToServer(command);
+
         if (response.contains("ERROR")) {
-            AppUtils.showAlert("Ошибка", "Произошла ошибка при отправке команды на сервер.", Alert.AlertType.ERROR);
+            AppUtils.showAlert("Ошибка", "Произошла ошибка при отправке команды на сервер: " + response, Alert.AlertType.ERROR);
         } else {
             AppUtils.showAlert("Успех", "Сеанс обновлен успешно.", Alert.AlertType.INFORMATION);
             if (stage != null) stage.close();

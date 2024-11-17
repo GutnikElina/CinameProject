@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="500.0" prefWidth="800.0" spacing="15" style="-fx-background-color: #8d85a6;" xmlns="http://javafx.com/javafx/17.0.13" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Admin.MovieActions.FindMovie">
+    <HBox prefWidth="800.0" spacing="20.0">
+        <Label text="Название фильма:">
+         <font>
+            <Font name="Calibri Bold" size="20.0" />
+         </font>
+         <padding>
+            <Insets top="5.0" />
+         </padding>
+      </Label>
+        <TextField fx:id="movieTitleField" prefHeight="30.0" prefWidth="265.0" promptText="Введите название фильма">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <font>
+            <Font size="13.0" />
+         </font>
+      </TextField>
+        <Button onAction="#fetchMovieDetails" prefHeight="28.0" prefWidth="133.0" style="-fx-background-color: #9cd18c;" text="Получить данные" textAlignment="CENTER">
+         <font>
+            <Font name="Segoe UI Semibold" size="13.0" />
+         </font>
+      </Button>
+      <padding>
+         <Insets left="50.0" top="20.0" />
+      </padding>
+    </HBox>
+    <HBox prefWidth="800.0" spacing="20" style="-fx-padding: 20px; -fx-spacing: 20px; -fx-alignment: center;">
+        <GridPane hgap="8" prefHeight="303.0" prefWidth="452.0" style="-fx-padding: 10px; -fx-hgap: 8px; -fx-vgap: 8px; -fx-background-color: #f3f1fb; -fx-border-radius: 10px; -fx-border-color: #ddd; -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 5, 0, 0, 5);" vgap="8">
+            <Label text="Название:" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <font>
+               <Font name="Segoe UI Semibold" size="13.0" />
+            </font></Label>
+            <Label fx:id="titleLabel" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <Label text="Жанр:" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            <font>
+               <Font name="Segoe UI Semibold" size="13.0" />
+            </font></Label>
+            <Label fx:id="genreLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label text="Продолжительность:" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <font>
+               <Font name="Segoe UI Semibold" size="13.0" />
+            </font></Label>
+            <Label fx:id="durationLabel" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label text="Дата выхода:" GridPane.columnIndex="0" GridPane.rowIndex="3">
+            <font>
+               <Font name="Segoe UI Semibold" size="13.0" />
+            </font></Label>
+            <Label fx:id="releaseDateLabel" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label text="Описание:" GridPane.columnIndex="0" GridPane.rowIndex="4">
+            <font>
+               <Font name="Segoe UI Semibold" size="13.0" />
+            </font></Label>
+            <TextArea fx:id="descriptionArea" editable="false" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+         <columnConstraints>
+            <ColumnConstraints maxWidth="134.5" minWidth="34.0" prefWidth="132.5" />
+            <ColumnConstraints maxWidth="388.0" minWidth="287.5" prefWidth="289.5" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
+        </GridPane>
+        <VBox alignment="CENTER" spacing="10" style="-fx-alignment: center; -fx-padding: 6px;">
+            <Button fx:id="trailerButton" disable="true" onAction="#openTrailer" prefHeight="35.0" prefWidth="149.0" style="-fx-background-color: #bdc3c7;" text="Смотреть трейлер">
+            <font>
+               <Font name="Segoe UI Semibold" size="13.0" />
+            </font></Button>
+            <ImageView fx:id="posterView" fitHeight="220.0" style="-fx-fit-height: 200px; -fx-fit-width: 260px;" />
+        </VBox>
+    </HBox>
+    <Button fx:id="backButton" onAction="#handleBackButton" prefHeight="32.0" prefWidth="139.0" style="-fx-background-color: #d58c84;" styleClass="button" text="Назад">
+      <VBox.margin>
+         <Insets left="70.0" />
+      </VBox.margin>
+      <font>
+         <Font name="Segoe UI Semibold" size="13.0" />
+      </font></Button>
+</VBox>

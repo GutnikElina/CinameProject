@@ -2,10 +2,13 @@ package Admin.MovieActions;
 
 import Utils.AppUtils;
 import javafx.application.Application;
+import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,82 +18,79 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetAllMovies extends Application {
+public class GetAllMovies {
 
-    private ListView<String> moviesListView;
+    @FXML
+    private ListView<String> listView;
+    @FXML
     private Button backButton;
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Все фильмы");
+    private String command = "MOVIE;GET_ALL;";
 
-        moviesListView = new ListView<>();
-        moviesListView.setPrefHeight(300);
-
-        backButton = new Button("Назад");
-        backButton.setOnAction(e -> primaryStage.close());
-
-        VBox root = new VBox(20);
-        root.setPadding(new Insets(20));
-        root.getChildren().addAll(moviesListView, backButton);
-
+    @FXML
+    private void initialize() {
         fetchAllMovies();
-
-        Scene scene = new Scene(root, 800, 500);
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        backButton.setOnAction(e -> handleBackButton());
     }
 
     private void fetchAllMovies() {
-        String message = "MOVIE;GET_ALL;";
-
         try (Socket socket = new Socket("localhost", 12345);
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-            out.println(message);
+            out.println(command);
 
             String response;
             List<String> movies = new ArrayList<>();
             while ((response = in.readLine()) != null) {
-                if (response.equals("END_OF_MOVIES")) {
+                if (response.startsWith("END")) {
                     break;
                 }
-                if (response.startsWith("MOVIE_FOUND;")) {
-                    String[] movieData = response.split(";");
-                    int movieId = Integer.parseInt(movieData[1]);
-                    String movieTitle = movieData[2];
-                    String genre = movieData[3];
-                    int duration = Integer.parseInt(movieData[4]);
-                    String releaseDate = movieData[5];
-                    String poster = movieData[6];
-                    String trailerUrl = movieData[7];
-                    String description = movieData[8];
-                    movies.add("ID: " + movieId + " - " + movieTitle + " (Жанр: " + genre + ", Длительность: " + duration + " мин.)");
+                if (isValidResponse(response)) {
+                    movies.add(formatItemResponse(response));
                 } else if (response.startsWith("ERROR;")) {
-                    AppUtils.showAlert("Ошибка", "Не удалось получить данные о фильмах.", Alert.AlertType.ERROR);
+                    handleError("Не удалось получить данные.");
                     break;
                 }
             }
-            updateMoviesListView(movies);
+            updateListView(movies);
 
         } catch (IOException e) {
-            AppUtils.showAlert("Ошибка", "Не удалось получить данные о фильмах.", Alert.AlertType.ERROR);
+            handleError("Не удалось получить данные.");
             e.printStackTrace();
         }
     }
 
-    private void updateMoviesListView(List<String> movies) {
-        moviesListView.getItems().clear();
-        if (movies.isEmpty()) {
-            moviesListView.getItems().add("Нет доступных фильмов.");
+    private boolean isValidResponse(String response) {
+        return response.startsWith("MOVIE_FOUND;");
+    }
+
+    private String formatItemResponse(String response) {
+        String[] movieData = response.split(";");
+        int movieId = Integer.parseInt(movieData[1]);
+        String movieTitle = movieData[2];
+        String genre = movieData[3];
+        int duration = Integer.parseInt(movieData[4]);
+        return "ID: " + movieId + " - " + movieTitle + " (Жанр: " + genre + ", Длительность: " + duration + " мин.)";
+    }
+
+    private void updateListView(List<String> items) {
+        listView.getItems().clear();
+        if (items.isEmpty()) {
+            listView.getItems().add("Нет доступных фильмов.");
         } else {
-            moviesListView.getItems().addAll(movies);
+            listView.getItems().addAll(items);
         }
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    private void handleError(String message) {
+        AppUtils.showAlert("Ошибка", message, Alert.AlertType.ERROR);
+    }
+
+    @FXML
+    private void handleBackButton() {
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.close();
     }
 }
+

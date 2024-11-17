@@ -1,7 +1,13 @@
 package Utils;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class FieldValidator {
     // Валидация текстового поля
@@ -16,6 +22,7 @@ public class FieldValidator {
             return true;
         }
     }
+
     // Валидация числового поля
     public static boolean validateNumericField(TextField textField, String errorMessage) {
         try {
@@ -28,6 +35,7 @@ public class FieldValidator {
             return false;
         }
     }
+
     // Валидация положительного числа
     public static boolean validatePositiveNumericField(TextField textField, String errorMessage) {
         try {
@@ -45,6 +53,7 @@ public class FieldValidator {
             return false;
         }
     }
+
     // Валидация URL
     public static boolean validateUrlField(TextField textField, String errorMessage) {
         String url = textField.getText().trim();
@@ -58,4 +67,30 @@ public class FieldValidator {
         }
     }
 
+    // Валидация даты (например, yyyy-MM-dd)
+    public static boolean validateDate(DatePicker datePicker, String errorMessage) {
+        LocalDate date = datePicker.getValue();
+        if (date == null) {
+            datePicker.setStyle("-fx-border-color: #ff4444; -fx-border-width: 2;");
+            UIUtils.showAlert("Ошибка", errorMessage, Alert.AlertType.ERROR);
+            return false;
+        } else {
+            datePicker.setStyle("");
+            return true;
+        }
+    }
+
+    // Валидация времени (например, HH:mm)
+    public static boolean validateTime(TextField textField, String errorMessage) {
+        String time = textField.getText().trim();
+        try {
+            LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"));
+            textField.setStyle("");
+            return true;
+        } catch (DateTimeParseException e) {
+            textField.setStyle("-fx-border-color: #ff4444; -fx-border-width: 2;");
+            UIUtils.showAlert("Ошибка", errorMessage, Alert.AlertType.ERROR);
+            return false;
+        }
+    }
 }

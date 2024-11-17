@@ -1,6 +1,9 @@
 package Handlers;
 
 import java.io.PrintWriter;
+import java.util.Arrays;
+
+import Services.AuthService;
 
 public abstract class EntityHandler<T> implements CommandHandler {
     protected abstract void addEntity(String[] requestParts, PrintWriter out);
@@ -8,6 +11,8 @@ public abstract class EntityHandler<T> implements CommandHandler {
     protected abstract void deleteEntity(String[] requestParts, PrintWriter out);
     protected abstract void getEntity(String[] requestParts, PrintWriter out);
     protected abstract void getAllEntities(PrintWriter out);
+
+    AuthService authService = new AuthService();
 
     protected int parseInt(String value, PrintWriter out) {
         try {
@@ -31,7 +36,7 @@ public abstract class EntityHandler<T> implements CommandHandler {
                 case "ADD": addEntity(requestParts, out); break;
                 case "DELETE": deleteEntity(requestParts, out); break;
                 case "UPDATE": updateEntity(requestParts, out); break;
-                case "GET": getEntity(requestParts, out); break;
+                case "GET", "CHECK": getEntity(requestParts, out); break;
                 case "GET_ALL": getAllEntities(out); break;
                 default: sendError(out, "Неизвестная команда!");
             }
@@ -43,4 +48,13 @@ public abstract class EntityHandler<T> implements CommandHandler {
     protected void sendError(PrintWriter out, String message) {
         out.println("ERROR;" + message);
     }
+
+    protected boolean checkAccess(PrintWriter out, String token, String requiredRole) {
+        if (token == null || !authService.hasPermission(token, requiredRole)) {
+            sendError(out, "Доступ запрещен");
+            return true;
+        }
+        return false;
+    }
+
 }

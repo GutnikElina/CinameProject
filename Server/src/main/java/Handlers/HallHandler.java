@@ -1,6 +1,7 @@
 package Handlers;
 
 import Models.Hall;
+import Services.AuthService;
 import Services.HallService;
 import lombok.AllArgsConstructor;
 
@@ -13,6 +14,8 @@ public class HallHandler extends EntityHandler<Hall> {
 
     @Override
     protected void addEntity(String[] requestParts, PrintWriter out) {
+        if (requestParts.length < 3 ) return;
+
         Hall hall = parseHall(requestParts, out);
         if (hall != null) {
             hallService.add(hall);
@@ -39,8 +42,13 @@ public class HallHandler extends EntityHandler<Hall> {
         try {
             int hallId = parseInt(requestParts[2], out);
             if (hallId != -1) {
-                hallService.delete(hallId);
-                out.println("HALL_DELETED");
+                Hall hall = hallService.getById(hallId);
+                if (hall != null) {
+                    hallService.delete(hallId);
+                    out.println("HALL_DELETED");
+                } else {
+                    out.println("HALL_NOT_FOUND");
+                }
             }
         } catch (Exception e) {
             sendError(out, "Ошибка при удалении зала: " + e.getMessage());

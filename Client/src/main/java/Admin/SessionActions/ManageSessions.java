@@ -1,63 +1,64 @@
 package Admin.SessionActions;
 
-import Elements.Menu.AdminMenu;
-import javafx.application.Application;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
+import Utils.UIUtils;
+import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import Utils.UIUtils;
 
-public class ManageSessions extends Application {
+public class ManageSessions {
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Управление сеансами");
+    @FXML
+    private Button addSessions;
+    @FXML
+    private Button deleteSessions;
+    @FXML
+    private Button findSessions;
+    @FXML
+    private Button getAllSessions;
+    @FXML
+    private Button updateSessions;
+    @FXML
+    private Button out;
 
-        Label titleLabel = UIUtils.createLabel("Управление сеансами", 24);
-        VBox buttonBox = UIUtils.createVBox(15, Pos.CENTER,
-                createSessionActionButton("Добавить сеанс", "ADD_SESSION"),
-                createSessionActionButton("Удалить сеанс", "DELETE_SESSION"),
-                createSessionActionButton("Найти сеанс", "GET_SESSION"),
-                createSessionActionButton("Вывести все сеансы", "GET_ALL_SESSIONS"),
-                createSessionActionButton("Обновить сеанс", "UPDATE_SESSION")
-        );
-
-        Button backButton = UIUtils.createButton("Назад", 300, e -> AdminMenu.show("yourToken"), true);
-        VBox vbox = UIUtils.createVBox(20, Pos.CENTER, titleLabel, buttonBox, backButton);
-
-        Scene scene = new Scene(vbox, 800, 500);
-        scene.getStylesheets().add("/style.css");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+    @FXML
+    private void initialize() {
+        addSessions.setOnAction(e -> openAction("ADD"));
+        deleteSessions.setOnAction(e -> openAction("DELETE"));
+        findSessions.setOnAction(e -> openAction("GET"));
+        getAllSessions.setOnAction(e -> openAction("GET_ALL"));
+        updateSessions.setOnAction(e -> openAction("UPDATE"));
+        out.setOnAction(e -> closeWindow());
     }
 
-    private Button createSessionActionButton(String text, String action) {
-        return UIUtils.createButton(text, 300, e -> openSessionAction(action), false);
-    }
-
-    private void openSessionAction(String action) {
-        switch (action) {
-            case "ADD_SESSION":
-                new AddSession().start(new Stage());
-                break;
-            case "DELETE_SESSION":
-                new DeleteSession().start(new Stage());
-                break;
-            case "GET_SESSION":
-                new FindSession().start(new Stage());
-                break;
-            case "GET_ALL_SESSIONS":
-                new GetAllSessions().start(new Stage());
-                break;
-            case "UPDATE_SESSION":
-                new UpdateSession().start(new Stage());
-                break;
-            default:
-                UIUtils.showAlert("Ошибка", "Неизвестная команда", Alert.AlertType.ERROR);
+    private void openAction(String action) {
+        try {
+            switch (action) {
+//                case "ADD":
+//                    UIUtils.openNewWindow("/SceneBuilder/AddSession.fxml", "Добавить сеанс");
+//                    break;
+//                case "DELETE":
+//                    UIUtils.openNewWindow("/SceneBuilder/DeleteSession.fxml", "Удалить сеанс");
+//                    break;
+//                case "GET":
+//                    UIUtils.openNewWindow("/SceneBuilder/FindSession.fxml", "Найти сеанс");
+//                    break;
+                case "GET_ALL":
+                    UIUtils.openNewWindow("/SceneBuilder/GetAllSessions.fxml", "Все сеансы");
+                    break;
+//                case "UPDATE":
+//                    UIUtils.openNewWindow("/SceneBuilder/UpdateSession.fxml", "Обновить сеанс");
+//                    break;
+                default:
+                    UIUtils.showAlert("Ошибка", "Неизвестная команда", Alert.AlertType.ERROR);
+            }
+        } catch (Exception e) {
+            UIUtils.showAlert("Ошибка", "Ошибка при открытии окна: " + action, Alert.AlertType.ERROR);
         }
+    }
+
+    private void closeWindow() {
+        Stage stage = (Stage) out.getScene().getWindow();
+        stage.close();
     }
 }

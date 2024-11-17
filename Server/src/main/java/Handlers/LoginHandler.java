@@ -14,11 +14,12 @@ public class LoginHandler implements CommandHandler {
             out.println("ERROR;" + "Неверные данные для логина");
             return;
         }
+
         String[] loginResponse = authService.login(requestParts[1], requestParts[2]);
         if (loginResponse != null) {
-            out.println("LOGIN_SUCCESS;" + loginResponse[1] + ";" + loginResponse[0]);
+            out.println("LOGIN_SUCCESS;" + loginResponse[0] + ";" + loginResponse[1]);
         } else {
-            out.println("ERROR;" + "Неверный логин или пароль");
+            out.println("LOGIN_FAILED;Неверный логин или пароль");
         }
     }
 }

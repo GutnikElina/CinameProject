@@ -38,4 +38,14 @@ public class TicketService extends BaseService implements Repository<Ticket> {
             }
         });
     }
+
+    public boolean existsBySessionAndSeat(int sessionId, String seatNumber) {
+        return executeTransactionWithResult(session -> {
+            Query<Long> query = session.createQuery(
+                    "SELECT COUNT(t) FROM Ticket t WHERE t.sessionId = :sessionId AND t.seatNumber = :seatNumber", Long.class);
+            query.setParameter("sessionId", sessionId);
+            query.setParameter("seatNumber", seatNumber);
+            return query.uniqueResult() > 0;
+        });
+    }
 }

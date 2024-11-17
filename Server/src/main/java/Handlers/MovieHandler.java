@@ -1,10 +1,12 @@
 package Handlers;
 
 import Models.Movie;
+import Services.AuthService;
 import Services.MovieService;
 import lombok.AllArgsConstructor;
 
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.List;
 
 @AllArgsConstructor
@@ -51,6 +53,7 @@ public class MovieHandler extends EntityHandler<Movie> {
             movie.setReleaseDate(requestParts[6].isEmpty() ? null : java.sql.Date.valueOf(requestParts[6]));
             movie.setPoster(requestParts[7].isEmpty() ? null : requestParts[7]);
             movie.setTrailerUrl(requestParts[8].isEmpty() ? null : requestParts[8]);
+            movie.setDescription(requestParts.length > 9 && !requestParts[9].isEmpty() ? requestParts[9] : null);
 
             movieService.update(movie);
             out.println("MOVIE_UPDATED");
@@ -69,8 +72,14 @@ public class MovieHandler extends EntityHandler<Movie> {
         try {
             int movieId = parseInt(requestParts[2], out);
             if (movieId == -1) return;
-            movieService.delete(movieId);
-            out.println("MOVIE_DELETED");
+
+            Movie movie = movieService.getById(movieId);
+            if (movie != null) {
+                movieService.delete(movieId);
+                out.println("MOVIE_DELETED");
+            } else {
+                out.println("MOVIE_NOT_FOUND");
+            }
         } catch (Exception e) {
             sendError(out, "Ошибка при удалении фильма");
         }
@@ -79,13 +88,13 @@ public class MovieHandler extends EntityHandler<Movie> {
     @Override
     protected void getEntity(String[] requestParts, PrintWriter out) {
         if (requestParts.length < 3) {
-            sendError(out, "Не указан ID фильма");
+            sendError(out, "Не указано название фильма");
             return;
         }
 
+        String movieTitle = requestParts[2];
         try {
-            int movieId = Integer.parseInt(requestParts[2]);
-            Movie movie = movieService.getById(movieId);
+            Movie movie = movieService.getByTitle(movieTitle);
             if (movie != null) {
                 out.println("MOVIE_FOUND;" + movie.getId() + ";" + movie.getTitle() + ";" +
                         movie.getGenre() + ";" + movie.getDuration() + ";" +
@@ -94,8 +103,6 @@ public class MovieHandler extends EntityHandler<Movie> {
             } else {
                 sendError(out, "Фильм не найден");
             }
-        } catch (NumberFormatException e) {
-            sendError(out, "Неверный формат ID фильма");
         } catch (Exception e) {
             sendError(out, "Ошибка при поиске фильма");
         }

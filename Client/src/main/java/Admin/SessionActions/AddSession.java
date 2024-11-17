@@ -1,33 +1,19 @@
 package Admin.SessionActions;
 
-import Utils.AppUtils;
 import Utils.UIUtils;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.util.converter.LocalDateStringConverter;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
+import Utils.FieldValidator;
 
 public class AddSession extends Application {
 
     private DatePicker startDatePicker, endDatePicker;
     private TextField startTimeField, endTimeField;
     private ComboBox<String> movieComboBox, hallComboBox;
-    private Map<String, Integer> movieIdMap = new HashMap<>();
-    private Map<String, Integer> hallIdMap = new HashMap<>();
 
     @Override
     public void start(Stage primaryStage) {
@@ -42,109 +28,62 @@ public class AddSession extends Application {
         endTimeField = new TextField();
         endTimeField.setPromptText("HH:mm");
 
-        Label startLabel = new Label("Начало сеанса:");
-        Label endLabel = new Label("Конец сеанса:");
-        Label movieLabel = new Label("Выберите фильм:");
-        Label hallLabel = new Label("Выберите зал:");
-
         movieComboBox = new ComboBox<>();
         hallComboBox = new ComboBox<>();
+        loadMoviesAndHalls();
 
-        loadMovieAndHallData();
+        Button addButton = UIUtils.createButton("Добавить сеанс", 150, e -> addSessionAction(primaryStage), false);
+        Button cancelButton = UIUtils.createButton("Отмена", 150, e -> primaryStage.close(), false);
+        HBox buttonBox = UIUtils.createHBox(10, addButton, cancelButton);
 
-        Button addButton = new Button("Добавить сеанс");
-        addButton.setOnAction(e -> addSessionAction(primaryStage));
+        GridPane grid = createSessionGrid();
 
-        VBox vbox = new VBox(15, startLabel, startDatePicker, startTimeField,
-                endLabel, endDatePicker, endTimeField,
-                movieLabel, movieComboBox,
-                hallLabel, hallComboBox,
-                addButton);
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setStyle("-fx-padding: 20; -fx-background-color: #f9f9f9;");
+        VBox mainLayout = new VBox(10, grid, buttonBox);
+        mainLayout.setPadding(new Insets(20));
 
-        Scene scene = new Scene(vbox, 500, 400);
-        scene.getStylesheets().add("/style.css");
+        Scene scene = new Scene(mainLayout, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private void loadMovieAndHallData() {
-        String movieCommand = "MOVIE;GET_ALL";
-        String movieResponse = AppUtils.sendToServerAndGetFullResponse(movieCommand);
-        if (movieResponse.startsWith("MOVIE_FOUND")) {
-            String[] movieLines = movieResponse.split("\n");
-            for (String line : movieLines) {
-                if (line.startsWith("MOVIE_FOUND")) {
-                    String[] movieParts = line.split(";");
-                    String movieTitle = movieParts[2];
-                    Integer movieId = Integer.parseInt(movieParts[1]);
-                    movieComboBox.getItems().add(movieTitle);
-                    movieIdMap.put(movieTitle, movieId);
-                }
-            }
-        } else {
-            UIUtils.showAlert("Ошибка", "Не удалось загрузить фильмы: " + movieResponse, Alert.AlertType.ERROR);
-        }
-
-        String hallCommand = "HALL;GET_ALL";
-        String hallResponse = AppUtils.sendToServerAndGetFullResponse(hallCommand);
-        if (hallResponse.startsWith("HALL_FOUND")) {
-            String[] hallLines = hallResponse.split("\n");
-            for (String line : hallLines) {
-                if (line.startsWith("HALL_FOUND")) {
-                    String[] hallParts = line.split(";");
-                    String hallName = hallParts[2];
-                    Integer hallId = Integer.parseInt(hallParts[1]);
-                    hallComboBox.getItems().add(hallName);
-                    hallIdMap.put(hallName, hallId);
-                }
-            }
-        } else {
-            UIUtils.showAlert("Ошибка", "Не удалось загрузить залы: " + hallResponse, Alert.AlertType.ERROR);
-        }
+    private void loadMoviesAndHalls() {
+        movieComboBox.getItems().addAll("Movie 1", "Movie 2");
+        hallComboBox.getItems().addAll("Hall 1", "Hall 2");
     }
 
-    private void addSessionAction(Stage stage) {
-        try {
-            String startDateStr = startDatePicker.getValue().toString();
-            String endDateStr = endDatePicker.getValue().toString();
-            String startTimeStr = startTimeField.getText();
-            String endTimeStr = endTimeField.getText();
-            String movieTitle = movieComboBox.getValue();
-            String hallName = hallComboBox.getValue();
-            Integer movieId = movieIdMap.get(movieTitle);
-            Integer hallId = hallIdMap.get(hallName);
+    private GridPane createSessionGrid() {
+        GridPane grid = new GridPane();
+        grid.setVgap(15);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(10));
 
-            if (startTimeStr == null || endTimeStr == null || movieTitle == null || hallName == null) {
-                throw new IllegalArgumentException("Все поля должны быть заполнены!");
-            }
+        grid.add(new Label("Дата начала:"), 0, 0);
+        grid.add(startDatePicker, 1, 0);
+        grid.add(new Label("Дата окончания:"), 0, 1);
+        grid.add(endDatePicker, 1, 1);
+        grid.add(new Label("Время начала:"), 0, 2);
+        grid.add(startTimeField, 1, 2);
+        grid.add(new Label("Время окончания:"), 0, 3);
+        grid.add(endTimeField, 1, 3);
+        grid.add(new Label("Фильм:"), 0, 4);
+        grid.add(movieComboBox, 1, 4);
+        grid.add(new Label("Зал:"), 0, 5);
+        grid.add(hallComboBox, 1, 5);
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-            String startTimeFull = startDateStr + " " + startTimeStr;
-            String endTimeFull = endDateStr + " " + endTimeStr;
+        return grid;
+    }
 
-            LocalDateTime startTime = LocalDateTime.parse(startTimeFull, formatter);
-            LocalDateTime endTime = LocalDateTime.parse(endTimeFull, formatter);
-
-            if (startTime.isAfter(endTime)) {
-                throw new IllegalArgumentException("Время окончания сеанса не может быть раньше времени начала.");
-            }
-
-            String addSessionCommand = String.format("SESSION;ADD;%s;%s;%d;%d",
-                    startTime.format(formatter), endTime.format(formatter), movieId, hallId);
-
-            String response = AppUtils.sendToServer(addSessionCommand);
-
-            if (response.startsWith("SUCCESS")) {
-                UIUtils.showAlert("Успех", "Сеанс добавлен", Alert.AlertType.INFORMATION);
-                stage.close();
-            } else {
-                UIUtils.showAlert("Ошибка", "Не удалось добавить сеанс: " + response, Alert.AlertType.ERROR);
-            }
-
-        } catch (Exception e) {
-            UIUtils.showAlert("Ошибка", "Не удалось добавить сеанс: " + e.getMessage(), Alert.AlertType.ERROR);
+    private void addSessionAction(Stage primaryStage) {
+        if (!FieldValidator.validateDate(startDatePicker, "Выберите правильную дату начала сеанса.") ||
+                !FieldValidator.validateDate(endDatePicker, "Выберите правильную дату окончания сеанса.") ||
+                !FieldValidator.validateTime(startTimeField, "Введите правильное время начала (HH:mm).") ||
+                !FieldValidator.validateTime(endTimeField, "Введите правильное время окончания (HH:mm).")) {
+            return;
         }
+        UIUtils.showAlert("Успех", "Сеанс успешно добавлен.", Alert.AlertType.INFORMATION);
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }

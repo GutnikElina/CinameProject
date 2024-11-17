@@ -38,4 +38,13 @@ public class MovieService extends BaseService implements Repository<Movie> {
             }
         });
     }
+
+    public Movie getByTitle(String title) {
+        return executeTransactionWithResult(session -> {
+            Query<Movie> query = session.createQuery("FROM Movie WHERE title = :title", Movie.class);
+            query.setParameter("title", title);
+            return query.uniqueResult();
+        });
+    }
+
 }

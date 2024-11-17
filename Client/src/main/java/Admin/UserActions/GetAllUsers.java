@@ -1,12 +1,10 @@
 package Admin.UserActions;
 
 import Utils.AppUtils;
-import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,78 +14,75 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetAllUsers extends Application {
-
-    private ListView<String> usersListView;
+public class GetAllUsers {
+    @FXML
+    private ListView<String> listView;
+    @FXML
     private Button backButton;
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Все пользователи");
+    private String command = "USER;GET_ALL;";
 
-        usersListView = new ListView<>();
-        usersListView.setPrefHeight(300);
-
-        backButton = new Button("Назад");
-
-        backButton.setAlignment(Pos.CENTER);
-        backButton.setOnAction(e -> primaryStage.close());
-
-        VBox root = new VBox(20);
-        root.setPadding(new Insets(20));
-        root.getChildren().addAll(usersListView, backButton);
-
+    @FXML
+    private void initialize() {
         fetchAllUsers();
-
-        Scene scene = new Scene(root, 800, 500);
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        backButton.setOnAction(e -> handleBackButton());
     }
 
     private void fetchAllUsers() {
-        String message = "USER;GET_ALL;";
-
         try (Socket socket = new Socket("localhost", 12345);
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-            out.println(message);
+            out.println(command);
 
-            String response;
             List<String> users = new ArrayList<>();
+            String response;
             while ((response = in.readLine()) != null) {
                 if (response.equals("END_OF_USERS")) {
                     break;
                 }
-                if (response.startsWith("USER_FOUND;")) {
-                    String[] userData = response.split(";");
-                    int userId = Integer.parseInt(userData[1]);
-                    String username = userData[2];
-                    users.add("ID: " + userId + " - " + username);
+                if (isValidResponse(response)) {
+                    users.add(formatUserResponse(response));
                 } else if (response.startsWith("ERROR;")) {
-                    AppUtils.showAlert("Ошибка", "Не удалось получить данные о пользователях.", Alert.AlertType.ERROR);
+                    handleError("Не удалось получить данные.");
                     break;
                 }
             }
-            updateUsersListView(users);
+            updateListView(users);
 
         } catch (IOException e) {
-            AppUtils.showAlert("Ошибка", "Не удалось получить данные о пользователях.", Alert.AlertType.ERROR);
-            e.printStackTrace();
+            handleError("Не удалось получить данные.");
         }
     }
 
-    private void updateUsersListView(List<String> users) {
-        usersListView.getItems().clear();
+    private boolean isValidResponse(String response) {
+        return response.startsWith("USER_FOUND;");
+    }
+
+    private String formatUserResponse(String response) {
+        String[] userData = response.split(";");
+        int userId = Integer.parseInt(userData[1]);
+        String username = userData[2];
+        String role = userData[3];
+        return "ID: " + userId + " - " + username + " (" + role + ")";
+    }
+
+    private void updateListView(List<String> users) {
+        listView.getItems().clear();
         if (users.isEmpty()) {
-            usersListView.getItems().add("Нет пользователей.");
+            listView.getItems().add("Нет доступных пользователей.");
         } else {
-            usersListView.getItems().addAll(users);
+            listView.getItems().addAll(users);
         }
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    @FXML
+    private void handleBackButton() {
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.close();
+    }
+
+    private void handleError(String message) {
+        AppUtils.showAlert("Ошибка", message, Alert.AlertType.ERROR);
     }
 }

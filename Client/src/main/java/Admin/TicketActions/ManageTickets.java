@@ -1,62 +1,61 @@
 package Admin.TicketActions;
 
-import Elements.Menu.AdminMenu;
 import Utils.UIUtils;
-import javafx.application.Application;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
+import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class ManageTickets extends Application {
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Управление билетами");
+public class ManageTickets {
 
-        Label titleLabel = UIUtils.createLabel("Управление билетами", 24);
-        VBox buttonBox = UIUtils.createVBox(15, Pos.CENTER,
-                createActionButton("Добавить билет", "ADD_TICKET"),
-                createActionButton("Удалить билет", "DELETE_TICKET"),
-                createActionButton("Найти билет", "GET_TICKET"),
-                createActionButton("Вывести все билеты", "GET_ALL_TICKETS"),
-                createActionButton("Обновить билет", "UPDATE_TICKET")
-        );
+    @FXML
+    private Button addTickets;
+    @FXML
+    private Button deleteTickets;
+    @FXML
+    private Button findTickets;
+    @FXML
+    private Button getAllTickets;
+    @FXML
+    private Button updateTickets;
+    @FXML
+    private Button out;
 
-        Button backButton = UIUtils.createButton("Назад", 300, e -> AdminMenu.show("yourToken"), true);
-        VBox vbox = UIUtils.createVBox(20, Pos.CENTER, titleLabel, buttonBox, backButton);
-
-        Scene scene = new Scene(vbox, 800, 500);
-        scene.getStylesheets().add("/style.css");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
-    private Button createActionButton(String text, String action) {
-        return UIUtils.createButton(text, 300, e -> openAction(action), false);
+    @FXML
+    private void initialize() {
+        addTickets.setOnAction(e -> openAction("ADD"));
+        deleteTickets.setOnAction(e -> openAction("DELETE"));
+        findTickets.setOnAction(e -> openAction("GET"));
+        getAllTickets.setOnAction(e -> openAction("GET_ALL"));
+        updateTickets.setOnAction(e -> openAction("UPDATE"));
+        out.setOnAction(e -> closeWindow());
     }
 
     private void openAction(String action) {
         switch (action) {
-            case "ADD_TICKET":
+            case "ADD":
                 new AddTicket().start(new Stage());
                 break;
-            case "DELETE_TICKET":
+            case "DELETE":
                 new DeleteTicket().start(new Stage());
                 break;
-            case "GET_TICKET":
+            case "GET":
                 new FindTicket().start(new Stage());
                 break;
-            case "GET_ALL_TICKETS":
+            case "GET_ALL":
                 new GetAllTickets().start(new Stage());
                 break;
-            case "UPDATE_TICKET":
+            case "UPDATE":
                 new UpdateTicket().start(new Stage());
                 break;
             default:
                 UIUtils.showAlert("Ошибка", "Неизвестная команда", Alert.AlertType.ERROR);
         }
     }
+
+    private void closeWindow() {
+        Stage stage = (Stage) out.getScene().getWindow();
+        stage.close();
+    }
 }
+

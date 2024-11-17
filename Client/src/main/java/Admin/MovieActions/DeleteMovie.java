@@ -1,50 +1,34 @@
 package Admin.MovieActions;
 
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import Utils.AppUtils;
 import Utils.FieldValidator;
 import Utils.UIUtils;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Alert;
+import javafx.stage.Stage;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class DeleteMovie extends Application {
+public class DeleteMovie {
 
-    private static final int SERVER_PORT = 12345;
+    @FXML
     private TextField idField;
+    @FXML
+    private Button backButton;
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Удалить фильм");
-
-        idField = UIUtils.createTextField("ID фильма");
-
-        Button deleteButton = new Button("Удалить фильм");
-        deleteButton.getStyleClass().add("button-danger");
-        deleteButton.setOnAction(e -> deleteMovieAction(primaryStage));
-
-        VBox vbox = new VBox(15, idField, deleteButton);
-        vbox.getStyleClass().add("vbox");
-        Scene scene = new Scene(vbox, 350, 220);
-        scene.getStylesheets().add("/style.css");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
-    private void deleteMovieAction(Stage primaryStage) {
+    @FXML
+    private void deleteMovieAction(ActionEvent event) {
+        // Проверка ввода
         if (!FieldValidator.validatePositiveNumericField(idField, "ID фильма должен быть положительным числом.")) {
             return;
         }
 
-        try (Socket socket = new Socket("localhost", SERVER_PORT);
+        try (Socket socket = new Socket("localhost", 12345);
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
@@ -53,19 +37,27 @@ public class DeleteMovie extends Application {
             out.println(command);
 
             String response = in.readLine();
-            if (response.equals("MOVIE_DELETED")) {
+            if ("MOVIE_DELETED".equals(response)) {
                 UIUtils.showAlert("Фильм удален", "Фильм был успешно удален.", Alert.AlertType.INFORMATION);
-                primaryStage.close();
+                closeStage();
+            } else if ("MOVIE_NOT_FOUND".equals(response)) {
+                UIUtils.showAlert("Ошибка", "Фильм с таким ID не найден.", Alert.AlertType.ERROR);
             } else if (response.startsWith("ERROR")) {
                 UIUtils.showAlert("Ошибка", response.split(";", 2)[1], Alert.AlertType.ERROR);
             }
         } catch (Exception e) {
-            UIUtils.showAlert("Ошибка", "Ошибка при отправке данных на сервер.", Alert.AlertType.ERROR);
+            UIUtils.showAlert("Ошибка", "Ошибка при соединении с сервером.", Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    @FXML
+    private void handleBackButton(ActionEvent event) {
+        closeStage();
+    }
+
+    private void closeStage() {
+        Stage stage = (Stage) idField.getScene().getWindow();
+        stage.close();
     }
 }

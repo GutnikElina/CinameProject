@@ -84,8 +84,14 @@ public class SessionHandler extends EntityHandler<FilmSession> {
         try {
             int sessionId = parseInt(requestParts[2], out);
             if (sessionId == -1) return;
-            sessionService.delete(sessionId);
-            out.println("SUCCESS: Сеанс удален");
+
+            FilmSession session = sessionService.getById(sessionId);
+            if (session != null) {
+                sessionService.delete(sessionId);
+                out.println("SUCCESS: Сеанс удален");
+            } else {
+                out.println("SESSION_NOT_FOUND");
+            }
         } catch (Exception e) {
             sendError(out, "Ошибка при удалении сеанса: " + e.getMessage());
         }
@@ -156,5 +162,4 @@ public class SessionHandler extends EntityHandler<FilmSession> {
             sendError(out, "Ошибка при получении сеансов: " + e.getMessage());
         }
     }
-
 }

@@ -1,47 +1,51 @@
 package Admin.UserActions;
 
+import Admin.GeneralActions.UserActionBase;
 import Models.User;
 import Utils.FieldValidator;
 import Utils.UIUtils;
-import javafx.scene.Scene;
-import javafx.geometry.Pos;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
-import javafx.scene.layout.VBox;
 
 public class AddUser extends UserActionBase {
+    @FXML
+    private TextField usernameField, passwordField;
+    @FXML
+    private Button backButton;
+    @FXML
+    private ComboBox<String> roleComboBox;
 
-    private TextField usernameField, passwordField, roleField;
-
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Добавить пользователя");
-
-        usernameField = UIUtils.createTextField("Введите логин пользователя");
-        passwordField = UIUtils.createTextField("Введите пароль");
-        roleField = UIUtils.createTextField("Введите роль пользователя");
-
-        VBox vbox = UIUtils.createVBox(15, Pos.CENTER,
-                UIUtils.createLabel("Добавление нового пользователя", 18),
-                usernameField, passwordField, roleField,
-                UIUtils.createButton("Добавить пользователя", 150, e -> addUserAction(primaryStage), false));
-
-        Scene scene = new Scene(vbox, 800, 500);
-        scene.getStylesheets().add("/style.css");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+    @FXML
+    private void initialize() {
+        roleComboBox.getItems().addAll("guest", "admin", "employee");
     }
 
-    private void addUserAction(Stage stage) {
+    @FXML
+    private void addUserAction() {
         boolean valid = true;
 
         valid &= FieldValidator.validateTextField(usernameField, "Логин должен содержать не менее 3 символов.", 3);
         valid &= FieldValidator.validateTextField(passwordField, "Пароль должен содержать не менее 5 символов.", 5);
-        valid &= FieldValidator.validateTextField(roleField, "Роль не может быть пустой.", 1);
+
+        if (roleComboBox.getValue() == null) {
+            UIUtils.showAlert("Ошибка", "Пожалуйста, выберите роль пользователя.", Alert.AlertType.ERROR);
+            valid = false;
+        }
 
         if (!valid) return;
 
-        User user = createUser(usernameField.getText(), passwordField.getText(), roleField.getText());
+        User user = createUser(usernameField.getText(), passwordField.getText(), roleComboBox.getValue());
+        Stage stage = (Stage) usernameField.getScene().getWindow();
         sendUserCommand(user, stage);
+    }
+
+    @FXML
+    private void handleBackButton() {
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.close();
     }
 }

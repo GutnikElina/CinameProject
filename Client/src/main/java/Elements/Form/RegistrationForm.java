@@ -1,38 +1,38 @@
 package Elements.Form;
 
+import Utils.AppUtils;
 import Utils.FieldValidator;
 import Utils.UIUtils;
+import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import MainApp.MainApp;
 
-public class RegistrationForm extends BaseForm {
+public class RegistrationForm {
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private Button registerButton;
+    @FXML
+    private Button backButton;
 
-    @Override
-    protected String getTitle() {
-        return "РЕГИСТРАЦИЯ";
+    @FXML
+    private void initialize() {
+        registerButton.setOnAction(e -> register());
+
+        backButton.setOnAction(e -> {
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            stage.close();
+        });
     }
 
-    @Override
-    protected void configureForm(VBox vbox, Stage stage) {
-        TextField usernameField = UIUtils.createTextField("Логин");
-        PasswordField passwordField = UIUtils.createPasswordField("Пароль");
-
-        Button registerButton = createButton("Зарегистрироваться", e -> register(usernameField, passwordField, stage));
-        Button backButton = createButton("Назад", e -> stage.close());
-
-        vbox.getChildren().addAll(usernameField, passwordField, registerButton, backButton);
-    }
-
-    private Button createButton(String text, javafx.event.EventHandler<javafx.event.ActionEvent> eventHandler) {
-        return UIUtils.createButton(text, 200, eventHandler, false);
-    }
-
-    private void register(TextField usernameField, PasswordField passwordField, Stage stage) {
-        resetFieldStyles(usernameField, passwordField);
+    private void register() {
+        resetFieldStyles();
 
         boolean isValid = true;
         isValid &= FieldValidator.validateTextField(usernameField, "Логин должен содержать минимум 3 символа.", 3);
@@ -41,11 +41,14 @@ public class RegistrationForm extends BaseForm {
         if (isValid) {
             String username = usernameField.getText();
             String password = passwordField.getText();
+
             MainApp.getInstance().getServerConnection().sendMessage("REGISTER;" + username + ";" + password);
+        } else {
+            AppUtils.showAlert("Ошибка", "Пожалуйста, проверьте введенные данные.", Alert.AlertType.ERROR);
         }
     }
 
-    private void resetFieldStyles(TextField usernameField, PasswordField passwordField) {
+    private void resetFieldStyles() {
         usernameField.setStyle("-fx-border-color: none;");
         passwordField.setStyle("-fx-border-color: none;");
     }

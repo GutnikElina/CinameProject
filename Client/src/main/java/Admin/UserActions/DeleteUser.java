@@ -1,37 +1,33 @@
 package Admin.UserActions;
 
+import Admin.GeneralActions.UserActionBase;
 import Utils.FieldValidator;
 import Utils.UIUtils;
-import javafx.scene.Scene;
-import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
-import javafx.scene.layout.VBox;
 
 public class DeleteUser extends UserActionBase {
 
+    @FXML
     private TextField idField;
+    @FXML
+    private Button backButton;
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Удалить пользователя");
-
-        idField = UIUtils.createTextField("ID пользователя");
-
-        VBox vbox = UIUtils.createVBox(15, Pos.CENTER, idField,
-                UIUtils.createButton("Удалить пользователя", 200, e -> deleteUserAction(primaryStage), true));
-
-        Scene scene = new Scene(vbox, 350, 220);
-        scene.getStylesheets().add("/style.css");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
-    private void deleteUserAction(Stage stage) {
+    @FXML
+    private void deleteUserAction() {
         if (!FieldValidator.validateNumericField(idField, "ID пользователя должен быть числом.")) return;
 
         String command = "USER;DELETE;" + idField.getText();
+        Stage stage = (Stage) idField.getScene().getWindow();
         sendCommandToServer(command, stage);
+    }
+
+    @FXML
+    private void handleBackButton() {
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.close();
     }
 }

@@ -1,8 +1,13 @@
 package Admin.HallActions;
 
+import Admin.GeneralActions.HallActionBase;
+import Admin.GeneralActions.UserActionBase;
 import Models.Hall;
+import Models.User;
 import Utils.AppUtils;
+import Utils.FieldValidator;
 import Utils.UIUtils;
+import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,70 +15,18 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.time.LocalDateTime;
+
 public class FindHall extends HallActionBase {
 
+    @FXML
     private TextField hallIdField;
+    @FXML
     private Label nameLabel, capacityLabel;
+    @FXML
     private Button backButton;
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Информация о зале");
-
-        HBox inputPanel = createInputPanel();
-        GridPane detailsPane = createDetailsPane();
-        VBox root = new VBox(20, inputPanel, detailsPane, createBackButton(primaryStage));
-        root.setPadding(new Insets(20));
-
-        Scene scene = new Scene(root, 800, 500);
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
-    private HBox createInputPanel() {
-        HBox inputPanel = new HBox(10);
-        inputPanel.setAlignment(Pos.CENTER);
-        inputPanel.setPadding(new Insets(20));
-
-        hallIdField = UIUtils.createTextField("Введите ID зала");
-
-        Button fetchButton = UIUtils.createButton("Получить данные", 150, e -> fetchHallDetails(), false);
-
-        inputPanel.getChildren().addAll(new Label("ID зала:"), hallIdField, fetchButton);
-        return inputPanel;
-    }
-
-    private GridPane createDetailsPane() {
-        GridPane detailsPane = new GridPane();
-        detailsPane.setPadding(new Insets(20));
-        detailsPane.setHgap(10);
-        detailsPane.setVgap(10);
-        detailsPane.setStyle("-fx-background-color: #ffffff; -fx-border-radius: 10px; -fx-border-color: #ddd; -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 5, 0, 0, 5);");
-
-        nameLabel = createDetailLabel();
-        capacityLabel = createDetailLabel();
-
-        detailsPane.add(new Label("Название зала:"), 0, 0);
-        detailsPane.add(nameLabel, 1, 0);
-        detailsPane.add(new Label("Вместимость:"), 0, 1);
-        detailsPane.add(capacityLabel, 1, 1);
-
-        return detailsPane;
-    }
-
-    private Label createDetailLabel() {
-        Label label = new Label();
-        label.getStyleClass().add("search-label");
-        return label;
-    }
-
-    private Button createBackButton(Stage primaryStage) {
-        backButton = new Button("Назад");
-        backButton.setOnAction(e -> primaryStage.close());
-        return backButton;
-    }
-
+    @FXML
     private void fetchHallDetails() {
         try {
             int hallId = Integer.parseInt(hallIdField.getText());
@@ -104,4 +57,11 @@ public class FindHall extends HallActionBase {
         nameLabel.setText(hall.getName());
         capacityLabel.setText(String.valueOf(hall.getCapacity()));
     }
+
+    @FXML
+    private void handleBackButton() {
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.close();
+    }
 }
+
