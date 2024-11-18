@@ -38,6 +38,7 @@ public class AddMovie extends MovieActionBase {
 
         Movie movie = createMovieFromInput();
         Stage stage = (Stage) titleField.getScene().getWindow();
+
         sendMovieCommand(movie, stage);
     }
 

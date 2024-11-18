@@ -34,9 +34,10 @@ public class UpdateUser extends UserActionBase {
             valid = false;
         }
 
+        Stage stage = (Stage) updateButton.getScene().getWindow();
         if (valid) {
             User user = createUserFromInput();
-            sendUserUpdateCommand(user, null);
+            sendUserUpdateCommand(user, stage);
         }
     }
 

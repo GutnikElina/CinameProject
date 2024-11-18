@@ -29,6 +29,8 @@ public class AuthService extends BaseService {
                 }
 
                 user.setRole("guest");
+                String token = generateToken(user.getUsername(), user.getRole());
+                user.setToken(token);
                 session.save(user);
                 return true;
             } catch (Exception e) {
@@ -51,6 +53,9 @@ public class AuthService extends BaseService {
                     User user = users.get(0);
                     String role = user.getRole();
                     String token = generateToken(username, role);
+
+                    user.setToken(token);
+                    session.update(user);
                     return new String[]{token, role};
                 } else {
                     logger.warning("Неверный логин или пароль для пользователя: " + username);
@@ -63,15 +68,38 @@ public class AuthService extends BaseService {
         });
     }
 
+    public User getCurrentUser(String token) {
+        return executeTransactionWithResult(session -> {
+            try {
+                var claims = Jwts.parserBuilder()
+                        .setSigningKey(SECRET_KEY)
+                        .build()
+                        .parseClaimsJws(token)
+                        .getBody();
+
+                String username = claims.getSubject();
+
+                Query<User> query = session.createQuery("FROM User u WHERE u.username = :username", User.class);
+                query.setParameter("username", username);
+                return query.uniqueResult();
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Ошибка получения текущего пользователя: " + e.getMessage(), e);
+                return null;
+            }
+        });
+    }
+
     private String generateToken(String username, String role) {
         try {
-            return Jwts.builder()
+            String token = Jwts.builder()
                     .setSubject(username)
                     .claim("role", role)
                     .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + 86400000))
+                    .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 день
                     .signWith(SECRET_KEY)
                     .compact();
+            System.out.println("Generated token: " + token);
+            return token;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Ошибка генерации токена для пользователя: " + username, e);
             throw e;
@@ -79,7 +107,7 @@ public class AuthService extends BaseService {
     }
 
     public boolean hasPermission(String token, String requiredRole) {
-        System.out.println(token);
+        System.out.println("Token for validation: " + token);
         try {
             var claims = Jwts.parserBuilder()
                     .setSigningKey(SECRET_KEY)

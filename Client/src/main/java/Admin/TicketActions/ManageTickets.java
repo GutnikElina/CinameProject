@@ -34,19 +34,19 @@ public class ManageTickets {
     private void openAction(String action) {
         switch (action) {
             case "ADD":
-                new AddTicket().start(new Stage());
+                UIUtils.openNewWindow("/SceneBuilder/AddTicket.fxml", "Добавление билета");
                 break;
             case "DELETE":
-                new DeleteTicket().start(new Stage());
+                UIUtils.openNewWindow("/SceneBuilder/DeleteTicket.fxml", "Удаление билета");
                 break;
             case "GET":
-                new FindTicket().start(new Stage());
+                UIUtils.openNewWindow("/SceneBuilder/FindTicket.fxml", "Поиск билета");
                 break;
             case "GET_ALL":
-                new GetAllTickets().start(new Stage());
+                UIUtils.openNewWindow("/SceneBuilder/GetAllTickets.fxml", "Просмотр всех билетов");
                 break;
             case "UPDATE":
-                new UpdateTicket().start(new Stage());
+                UIUtils.openNewWindow("/SceneBuilder/UpdateTicket.fxml", "Обновление билетов");
                 break;
             default:
                 UIUtils.showAlert("Ошибка", "Неизвестная команда", Alert.AlertType.ERROR);

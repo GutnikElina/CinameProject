@@ -1,40 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <VBox prefHeight="600.0" prefWidth="800.0" spacing="20" style="-fx-background-color: #8d85a6;" xmlns="http://javafx.com/javafx/17.0.13" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Admin.MovieActions.AddMovie">
-    <Label text="Добавить фильм" />
+    <Label alignment="CENTER" text="Добавить фильм">
+      <font>
+         <Font name="Segoe UI Semibold" size="24.0" />
+      </font>
+      <VBox.margin>
+         <Insets left="300.0" top="30.0" />
+      </VBox.margin></Label>
     <GridPane hgap="10" vgap="15">
-        <Label text="Название фильма:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-        <TextField fx:id="titleField" promptText="Введите название фильма" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+        <Label alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="177.0" text="Название фильма:" GridPane.columnIndex="0" GridPane.rowIndex="0">
+         <font>
+            <Font name="Segoe UI Semibold" size="14.0" />
+         </font></Label>
+        <TextField fx:id="titleField" prefHeight="33.0" prefWidth="478.0" promptText="Введите название фильма" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-        <Label text="Жанр:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-        <TextField fx:id="genreField" promptText="Введите жанр" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        <Label alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="179.0" text="Жанр:" GridPane.columnIndex="0" GridPane.rowIndex="1">
+         <font>
+            <Font name="Segoe UI Semibold" size="14.0" />
+         </font></Label>
+        <TextField fx:id="genreField" prefHeight="34.0" prefWidth="478.0" promptText="Введите жанр" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-        <Label text="Продолжительность (мин):" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-        <TextField fx:id="durationField" promptText="Введите продолжительность" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+        <Label text="Продолжительность (мин):" GridPane.columnIndex="0" GridPane.rowIndex="2">
+         <font>
+            <Font name="Segoe UI Semibold" size="14.0" />
+         </font></Label>
+        <TextField fx:id="durationField" prefHeight="37.0" prefWidth="478.0" promptText="Введите продолжительность" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-        <Label text="Дата выхода:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-        <DatePicker fx:id="releaseDatePicker" promptText="Выберите дату" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+        <Label alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="179.0" text="Дата выхода:" GridPane.columnIndex="0" GridPane.rowIndex="3">
+         <font>
+            <Font name="Segoe UI Semibold" size="14.0" />
+         </font></Label>
+        <DatePicker fx:id="releaseDatePicker" prefHeight="36.0" prefWidth="174.0" promptText="Выберите дату" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-        <Label text="URL постера:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-        <TextField fx:id="posterField" promptText="Введите URL постера" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+        <Label alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="180.0" text="URL постера:" GridPane.columnIndex="0" GridPane.rowIndex="4">
+         <font>
+            <Font name="Segoe UI Semibold" size="14.0" />
+         </font></Label>
+        <TextField fx:id="posterField" prefHeight="37.0" prefWidth="478.0" promptText="Введите URL постера" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
-        <Label text="URL трейлера:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
-        <TextField fx:id="trailerField" promptText="Введите URL трейлера" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+        <Label alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="179.0" text="URL трейлера:" GridPane.columnIndex="0" GridPane.rowIndex="5">
+         <font>
+            <Font name="Segoe UI Semibold" size="14.0" />
+         </font></Label>
+        <TextField fx:id="trailerField" prefHeight="33.0" prefWidth="478.0" promptText="Введите URL трейлера" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 
-        <Label text="Описание:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
-        <TextArea fx:id="descriptionField" promptText="Введите описание фильма" GridPane.columnIndex="1" GridPane.rowIndex="6" prefRowCount="4" />
+        <Label alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="180.0" text="Описание:" GridPane.columnIndex="0" GridPane.rowIndex="6">
+         <font>
+            <Font name="Segoe UI Semibold" size="14.0" />
+         </font></Label>
+        <TextArea fx:id="descriptionField" prefHeight="102.0" prefRowCount="4" prefWidth="478.0" promptText="Введите описание фильма" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+      <columnConstraints>
+         <ColumnConstraints />
+         <ColumnConstraints />
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+      </rowConstraints>
     </GridPane>
-    <HBox spacing="20" alignment="CENTER">
-        <Button text="Добавить фильм" styleClass="enter" onAction="#addMovieAction" />
-        <Button fx:id="backButton" styleClass="button" text="Отмена" onAction="#handleBackButton" />
+    <HBox alignment="CENTER" spacing="20">
+        <Button onAction="#addMovieAction" prefHeight="36.0" prefWidth="144.0" styleClass="enter" text="Добавить фильм">
+         <font>
+            <Font name="Segoe UI Semibold" size="14.0" />
+         </font></Button>
+        <Button fx:id="backButton" onAction="#handleBackButton" prefHeight="38.0" prefWidth="145.0" styleClass="button" text="Отмена">
+         <font>
+            <Font name="Segoe UI Semibold" size="14.0" />
+         </font></Button>
     </HBox>
 </VBox>

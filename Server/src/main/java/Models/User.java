@@ -26,6 +26,9 @@ public class User {
     @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
+    @Column(nullable = true)
+    private String token;  // Токен пользователя
+
     public User(String username, String password) {
         this.username = username;
         this.password = password;

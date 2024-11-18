@@ -24,9 +24,16 @@ public class Ticket {
     @Column(name = "seat_number", nullable = false)
     private String seatNumber;              // Номер места, которое занимает билет
 
+    @Column(nullable = false)
+    private BigDecimal price;               // Цена билета
+
+    @Column(name = "status", nullable = false)
+    private String status;                  // Новый статус билета ("PENDING", "CONFIRMED", "CANCELLED", "EXCHANGED")
+
+    @Column(name = "requestType", nullable = false)
+    private String requestType;             // Тип запроса ("PURCHASE", "CANCEL", "EXCHANGE")
+
     @Column(name = "purchase_time", nullable = false)
     private LocalDateTime purchaseTime;     // Дата и время покупки билета
 
-    @Column(nullable = false)
-    private BigDecimal price;               // Цена билета
 }

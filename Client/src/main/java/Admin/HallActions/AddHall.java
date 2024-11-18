@@ -10,7 +10,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class AddHall extends HallActionBase {
-
+    @FXML
+    public Button addButton;
     @FXML
     private TextField hallField;
 
@@ -32,8 +33,8 @@ public class AddHall extends HallActionBase {
         Hall hall = new Hall();
         hall.setName(name);
         hall.setCapacity(capacity);
-
-        sendHallCommand("ADD", hall, null);
+        Stage stage = (Stage) addButton.getScene().getWindow();
+        sendHallCommand("ADD", hall, stage);
     }
 
     @FXML

@@ -22,6 +22,11 @@
                   <Font name="Tahoma" size="20.0" />
                </font>
             </Button>
+            <Button fx:id="buyTicket" layoutX="189.0" layoutY="136.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="322.0" styleClass="manage" text="Покупка билетов">
+               <font>
+                  <Font name="Tahoma" size="20.0" />
+               </font>
+            </Button>
             <Button fx:id="out" layoutX="248.0" layoutY="294.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="204.0" styleClass="button" text="Выйти">
                <font>
                   <Font name="Tahoma" size="20.0" />

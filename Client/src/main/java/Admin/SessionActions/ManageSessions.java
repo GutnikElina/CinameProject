@@ -34,21 +34,21 @@ public class ManageSessions {
     private void openAction(String action) {
         try {
             switch (action) {
-//                case "ADD":
-//                    UIUtils.openNewWindow("/SceneBuilder/AddSession.fxml", "Добавить сеанс");
-//                    break;
-//                case "DELETE":
-//                    UIUtils.openNewWindow("/SceneBuilder/DeleteSession.fxml", "Удалить сеанс");
-//                    break;
-//                case "GET":
-//                    UIUtils.openNewWindow("/SceneBuilder/FindSession.fxml", "Найти сеанс");
-//                    break;
+                case "ADD":
+                    UIUtils.openNewWindow("/SceneBuilder/AddSession.fxml", "Добавить сеанс");
+                    break;
+                case "DELETE":
+                    UIUtils.openNewWindow("/SceneBuilder/DeleteSession.fxml", "Удалить сеанс");
+                    break;
+                case "GET":
+                    UIUtils.openNewWindow("/SceneBuilder/FindSession.fxml", "Найти сеанс");
+                    break;
                 case "GET_ALL":
                     UIUtils.openNewWindow("/SceneBuilder/GetAllSessions.fxml", "Все сеансы");
                     break;
-//                case "UPDATE":
-//                    UIUtils.openNewWindow("/SceneBuilder/UpdateSession.fxml", "Обновить сеанс");
-//                    break;
+                case "UPDATE":
+                    UIUtils.openNewWindow("/SceneBuilder/UpdateSession.fxml", "Обновить сеанс");
+                    break;
                 default:
                     UIUtils.showAlert("Ошибка", "Неизвестная команда", Alert.AlertType.ERROR);
             }

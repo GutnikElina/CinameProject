@@ -14,6 +14,8 @@ public class UserMenu {
     @FXML
     private Button getAllSessions;
     @FXML
+    private Button buyTicket;
+    @FXML
     private Button findMovie;
     @FXML
     private Button out;
@@ -31,6 +33,7 @@ public class UserMenu {
     private void initialize() {
         setButtonAction(getAllSessions, "/SceneBuilder/GetAllSessions.fxml", "Просмотр сеансов");
         setButtonAction(findMovie, "/SceneBuilder/FindMovie.fxml", "Информация о фильме");
+        setButtonAction(buyTicket, "/SceneBuilder/BuyTicket.fxml", "Покупка билета");
 
         out.setOnAction(e -> {
             closeStageAndShowMainMenu();
@@ -47,7 +50,6 @@ public class UserMenu {
         MainMenu.show(new Stage());
     }
 }
-//                createNavigationButton("Покупка билетов", .class),
 //                createNavigationButton("Редактирование своего аккаунта", .class),
 //                createNavigationButton("Отмена билетов", .class),
 //                createNavigationButton("Обмен билетов", .class),

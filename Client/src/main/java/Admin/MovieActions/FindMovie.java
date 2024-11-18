@@ -62,7 +62,6 @@ public class FindMovie {
                         Integer.parseInt(movieData[1]), movieData[2], movieData[3],
                         Integer.parseInt(movieData[4]), movieData[5], movieData[6],
                         movieData[7], movieData[8]);
-                System.out.println(movie);
                 updateMovieDetails(movie);
             } else {
                 UIUtils.showAlert("Ошибка", "Получены некорректные данные о фильме.", Alert.AlertType.ERROR);

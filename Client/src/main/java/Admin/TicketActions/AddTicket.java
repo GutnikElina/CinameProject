@@ -1,60 +1,45 @@
 package Admin.TicketActions;
 
-import Utils.UIUtils;
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-import javafx.geometry.Pos;
-import javafx.stage.Stage;
 import Utils.AppUtils;
+import Utils.UIUtils;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class AddTicket extends Application {
-
+public class AddTicket {
+    @FXML
     private ComboBox<String> sessionComboBox;
+    @FXML
     private ComboBox<String> userComboBox;
-    private TextField seatNumberField, priceField;
-    private Label seatLabel, priceLabel, sessionLabel, userLabel;
+    @FXML
+    private TextField seatNumberField;
+    @FXML
+    private TextField priceField;
+    @FXML
+    private Button backButton;
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Добавить билет");
+    @FXML
+    private ComboBox<String> statusComboBox;
+    @FXML
+    private ComboBox<String> requestTypeComboBox;
 
-        sessionComboBox = new ComboBox<>();
-        loadSessionData();
-
-        userComboBox = new ComboBox<>();
+    @FXML
+    public void initialize() {
         loadUserData();
+        loadSessionData();
+        loadStatusOptions();
+        loadRequestTypeOptions();
+    }
 
-        seatNumberField = new TextField();
-        seatNumberField.setPromptText("Номер места");
+    private void loadStatusOptions() {
+        statusComboBox.getItems().addAll("PENDING", "CONFIRMED", "CANCELLED", "EXCHANGED");
+    }
 
-        priceField = new TextField();
-        priceField.setPromptText("Цена");
-
-        seatLabel = new Label("Номер места:");
-        priceLabel = new Label("Цена билета:");
-        sessionLabel = new Label("Выберите сеанс:");
-        userLabel = new Label("Выберите пользователя:");
-
-        Button addButton = new Button("Добавить билет");
-        addButton.setOnAction(e -> addTicketAction(primaryStage));
-
-        VBox vbox = new VBox(15, sessionLabel, sessionComboBox,
-                userLabel, userComboBox,
-                seatLabel, seatNumberField,
-                priceLabel, priceField,
-                addButton);
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setStyle("-fx-padding: 20; -fx-background-color: #f9f9f9;");
-
-        Scene scene = new Scene(vbox, 800, 500);
-        scene.getStylesheets().add("/style.css");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+    private void loadRequestTypeOptions() {
+        requestTypeComboBox.getItems().addAll("PURCHASE", "CANCEL", "EXCHANGE");
     }
 
     private void loadSessionData() {
@@ -63,22 +48,17 @@ public class AddTicket extends Application {
         if (sessionResponse.startsWith("SESSION_FOUND")) {
             String[] sessionLines = sessionResponse.split("\n");
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm");
-
             for (String line : sessionLines) {
                 if (line.startsWith("SESSION_FOUND")) {
                     String[] sessionParts = line.split(";");
-                    if (sessionParts.length >= 5) {
+                    if (sessionParts.length >= 6) {
                         try {
                             LocalDateTime startTime = LocalDateTime.parse(sessionParts[4]);
                             LocalDateTime endTime = LocalDateTime.parse(sessionParts[5]);
-
                             String sessionDetails = String.format(
                                     "ID: %s | Фильм: %s | Зал: %s | Начало: %s | Конец: %s",
-                                    sessionParts[1],
-                                    sessionParts[2],
-                                    sessionParts[3],
-                                    startTime.format(formatter),
-                                    endTime.format(formatter)
+                                    sessionParts[1], sessionParts[2], sessionParts[3],
+                                    startTime.format(formatter), endTime.format(formatter)
                             );
                             sessionComboBox.getItems().add(sessionDetails);
                         } catch (Exception e) {
@@ -93,7 +73,7 @@ public class AddTicket extends Application {
     }
 
     private void loadUserData() {
-        String userCommand = "USER;GET_ALL;";
+        String userCommand = "USER;GET_ALL";
         String userResponse = AppUtils.sendToServerAndGetFullResponse(userCommand);
         if (userResponse.startsWith("USER_FOUND")) {
             String[] userLines = userResponse.split("\n");
@@ -113,17 +93,20 @@ public class AddTicket extends Application {
         } else {
             UIUtils.showAlert("Ошибка", "Не удалось загрузить пользователей: " + userResponse, Alert.AlertType.ERROR);
         }
-
     }
 
-    private void addTicketAction(Stage stage) {
+    @FXML
+    private void addTicketAction() {
         try {
             String sessionDetails = sessionComboBox.getValue();
             String userDetails = userComboBox.getValue();
             String seatNumber = seatNumberField.getText();
             String priceStr = priceField.getText();
+            String status = statusComboBox.getValue();
+            String requestType = requestTypeComboBox.getValue();
 
-            if (sessionDetails == null || userDetails == null || seatNumber.isEmpty() || priceStr.isEmpty()) {
+            if (sessionDetails == null || userDetails == null || seatNumber.isEmpty() || priceStr.isEmpty()
+                    || status == null || requestType == null) {
                 throw new IllegalArgumentException("Все поля должны быть заполнены!");
             }
 
@@ -139,17 +122,24 @@ public class AddTicket extends Application {
                 return;
             }
 
-            String addTicketCommand = String.format("TICKET;ADD;%d;%s;%d;%s", sessionId, seatNumber, userId, price);
+            String addTicketCommand = String.format("TICKET;ADD;%d;%s;%d;%s;%s;%s",
+                    sessionId, seatNumber, userId, price, status, requestType);
             String response = AppUtils.sendToServer(addTicketCommand);
 
             if (response.startsWith("SUCCESS")) {
                 UIUtils.showAlert("Успех", "Билет добавлен", Alert.AlertType.INFORMATION);
-                stage.close();
+                handleBackButton();
             } else {
                 UIUtils.showAlert("Ошибка", "Не удалось добавить билет: " + response, Alert.AlertType.ERROR);
             }
         } catch (Exception e) {
             UIUtils.showAlert("Ошибка", "Не удалось добавить билет: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    @FXML
+    private void handleBackButton() {
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.close();
     }
 }

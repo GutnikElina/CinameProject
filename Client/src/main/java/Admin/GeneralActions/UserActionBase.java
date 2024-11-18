@@ -28,7 +28,7 @@ public abstract class UserActionBase {
 
         if (response.equals("USER_UPDATED")) {
             UIUtils.showAlert("Успех", "Пользователь успешно обновлен", Alert.AlertType.INFORMATION);
-            if (stage != null) stage.close();
+            stage.close();
         } else if (response.startsWith("USER_NOT_FOUND")) {
             UIUtils.showAlert("Ошибка", "Пользователь с таким ID не найден", Alert.AlertType.ERROR);
         } else if (response.contains("ERROR")) {

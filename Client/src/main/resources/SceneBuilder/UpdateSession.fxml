@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="600.0" prefWidth="800.0" spacing="20" style="-fx-background-color: #8d85a6;" xmlns="http://javafx.com/javafx/17.0.13" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Admin.SessionActions.UpdateSession">
+    <Label alignment="CENTER" prefHeight="95.0" prefWidth="315.0" text="Обновление сеанса">
+      <font>
+         <Font name="Segoe UI Semibold" size="27.0" />
+      </font>
+      <VBox.margin>
+         <Insets left="250.0" top="50.0" />
+      </VBox.margin></Label>
+    <GridPane hgap="10" vgap="15">
+        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="232.0" text="ID сеанса:" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Label>
+        <TextField fx:id="idField" prefHeight="34.0" prefWidth="200.0" promptText="Введите ID сеанса" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="231.0" text="Фильм:" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Label>
+        <ComboBox fx:id="movieComboBox" prefHeight="31.0" prefWidth="337.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="232.0" text="Зал:" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Label>
+        <ComboBox fx:id="hallComboBox" prefHeight="30.0" prefWidth="337.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="232.0" text="Время начала:" GridPane.columnIndex="0" GridPane.rowIndex="3">
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Label>
+        <TextField fx:id="startTimeField" prefHeight="37.0" prefWidth="200.0" promptText="Введите время начала (yyyy-MM-dd HH:mm)" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="230.0" text="Время окончания:" GridPane.columnIndex="0" GridPane.rowIndex="4">
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Label>
+        <TextField fx:id="endTimeField" prefHeight="34.0" prefWidth="336.0" promptText="Введите время окончания (yyyy-MM-dd HH:mm)" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+      <columnConstraints>
+         <ColumnConstraints />
+         <ColumnConstraints />
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+      </rowConstraints>
+    </GridPane>
+    <HBox alignment="CENTER" spacing="20">
+        <Button contentDisplay="CENTER" onAction="#updateSessionAction" prefHeight="33.0" prefWidth="174.0" styleClass="enter" text="Обновить сеанс" textAlignment="CENTER">
+         <HBox.margin>
+            <Insets left="20.0" />
+         </HBox.margin></Button>
+        <Button onAction="#handleBackButton" prefHeight="31.0" prefWidth="146.0" styleClass="button" text="Назад" />
+    </HBox>
+</VBox>

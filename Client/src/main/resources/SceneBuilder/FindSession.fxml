@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="500.0" prefWidth="800.0" spacing="15" style="-fx-background-color: #8d85a6;" xmlns="http://javafx.com/javafx/17.0.13" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Admin.SessionActions.FindSession">
+   <Label alignment="CENTER" contentDisplay="CENTER" text="Поиск сеанса">
+      <font>
+         <Font name="Segoe UI Semibold" size="27.0" />
+      </font>
+      <VBox.margin>
+         <Insets left="310.0" top="50.0" />
+      </VBox.margin>
+   </Label>
+    <HBox prefWidth="800.0" spacing="20.0" style="-fx-padding: 15px;">
+        <Label alignment="CENTER_RIGHT" prefHeight="23.0" prefWidth="106.0" text="ID сеанса:">
+            <font>
+                <Font name="Calibri Bold" size="20.0" />
+            </font>
+         <HBox.margin>
+            <Insets left="130.0" />
+         </HBox.margin>
+        </Label>
+        <TextField fx:id="idField" prefHeight="30.0" prefWidth="221.0" promptText="Введите ID сеанса">
+            <font>
+                <Font size="13.0" />
+            </font>
+        </TextField>
+        <Button onAction="#searchSessionById" prefHeight="28.0" prefWidth="112.0" styleClass="enter" text="Найти">
+            <font>
+                <Font name="Segoe UI Semibold" size="13.0" />
+            </font>
+        </Button>
+      <VBox.margin>
+         <Insets />
+      </VBox.margin>
+    </HBox>
+
+    <HBox prefWidth="800.0" spacing="20" style="-fx-padding: 20px; -fx-spacing: 20px; -fx-alignment: center;">
+        <GridPane hgap="8" prefHeight="0.0" prefWidth="452.0" style="-fx-padding: 10px; -fx-hgap: 8px; -fx-vgap: 8px; -fx-background-color: #f3f1fb; -fx-border-radius: 10px; -fx-border-color: #ddd; -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 5, 0, 0, 5);">
+            <Label text="Фильм:" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <font>
+                    <Font name="Segoe UI Semibold" size="15.0" />
+                </font>
+            </Label>
+            <Label fx:id="movieLabel" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <Label text="Зал:" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <font>
+                    <Font name="Segoe UI Semibold" size="15.0" />
+                </font>
+            </Label>
+            <Label fx:id="hallLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label text="Начало:" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                <font>
+                    <Font name="Segoe UI Semibold" size="15.0" />
+                </font>
+            </Label>
+            <Label fx:id="startTimeLabel" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label text="Конец:" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                <font>
+                    <Font name="Segoe UI Semibold" size="15.0" />
+                </font>
+            </Label>
+            <Label fx:id="endTimeLabel" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <columnConstraints>
+                <ColumnConstraints maxWidth="134.5" minWidth="34.0" prefWidth="132.5" />
+                <ColumnConstraints maxWidth="388.0" minWidth="287.5" prefWidth="289.5" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+            </rowConstraints>
+        </GridPane>
+    </HBox>
+
+    <Button fx:id="backButton" onAction="#handleBack" prefHeight="32.0" prefWidth="139.0" styleClass="button" text="Назад">
+        <font>
+            <Font name="Segoe UI Semibold" size="13.0" />
+        </font>
+      <VBox.margin>
+         <Insets left="320.0" />
+      </VBox.margin>
+    </Button>
+</VBox>

@@ -9,21 +9,23 @@ import Utils.AppUtils;
 
 public class EmployeeMenu {
 
-    public static String userToken;
+    public static String employeeToken;
 
     @FXML
     private Button getAllSessions;
     @FXML
     private Button findMovie;
     @FXML
+    private Button orderTicket;
+    @FXML
     private Button out;
 
     public static void show(String token) {
         if (token == null || token.isEmpty()) {
-            AppUtils.showAlert("Ошибка", "Необходим токен для доступа", Alert.AlertType.ERROR);
+            AppUtils.showAlert("Ошибка", "Необходим токен для доступа!", Alert.AlertType.ERROR);
             return;
         }
-        userToken = token;
+        employeeToken = token;
         UIUtils.loadScene(new Stage(), "/SceneBuilder/EmployeeMenu.fxml", "Меню работника");
     }
 
@@ -31,6 +33,9 @@ public class EmployeeMenu {
     private void initialize() {
         setButtonAction(getAllSessions, "/SceneBuilder/GetAllSessions.fxml", "Просмотр сеансов");
         setButtonAction(findMovie, "/SceneBuilder/FindMovies.fxml", "Информация о фильме");
+        setButtonAction(orderTicket, "/SceneBuilder/ConfirmTicket.fxml", "Подтверждение заказов билетов");
+        //setButtonAction(orderTicket, "/SceneBuilder/CancelTicket.fxml", "Подтверждение отмены билетов");
+        //setButtonAction(orderTicket, "/SceneBuilder/ChangeTicket.fxml", "Подтверждение обмена билетов");
 
         out.setOnAction(e -> {
             closeStageAndShowMainMenu();
@@ -47,7 +52,4 @@ public class EmployeeMenu {
         MainMenu.show(new Stage());
     }
 }
-//                createNavigationButton("Подтверждение заказов билетов", .class),
-//                createNavigationButton("Подтверждение отмены билетов", .class),
-//                createNavigationButton("Подтверждение обмена билетов", .class),
 //                createNavigationButton("Редактирование своего аккаунта", .class),

@@ -38,7 +38,7 @@ public class AppUtils {
             String line;
             while ((line = in.readLine()) != null) {
                 response.append(line).append("\n");
-                if (line.startsWith("END_OF_MOVIES") || line.startsWith("END_OF_HALLS") || line.startsWith("END_OF_SESSIONS") || line.startsWith("END_OF_USERS")) {
+                if (line.startsWith("END_OF_MOVIES") || line.startsWith("END_OF_HALLS") || line.startsWith("END_OF_SESSIONS") || line.startsWith("END_OF_USERS") || line.startsWith("END_OF_TICKETS")) {
                     break;
                 }
             }
@@ -61,6 +61,22 @@ public class AppUtils {
             Platform.runLater(() ->
                     UIUtils.showAlert("Ошибка", "Не удалось открыть ссылку: " + url, Alert.AlertType.ERROR)
             );
+        }
+    }
+
+    public static int getCurrentUserId(String token) {
+        try {
+            String response = sendToServer("USER;GET_CURRENT;" + token);
+            if (response.startsWith("USER_FOUND")) {
+                String[] parts = response.split(";");
+                return Integer.parseInt(parts[1]);
+            } else {
+                UIUtils.logError("Ошибка получения текущего пользователя: " + response, null);
+                return -1;
+            }
+        } catch (Exception e) {
+            UIUtils.logError("Ошибка при запросе текущего пользователя.", e);
+            return -1;
         }
     }
 

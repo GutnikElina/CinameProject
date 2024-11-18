@@ -1,11 +1,11 @@
 package Handlers;
 
 import Models.Hall;
-import Services.AuthService;
 import Services.HallService;
 import lombok.AllArgsConstructor;
 
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.List;
 
 @AllArgsConstructor
@@ -14,8 +14,6 @@ public class HallHandler extends EntityHandler<Hall> {
 
     @Override
     protected void addEntity(String[] requestParts, PrintWriter out) {
-        if (requestParts.length < 3 ) return;
-
         Hall hall = parseHall(requestParts, out);
         if (hall != null) {
             hallService.add(hall);
@@ -39,19 +37,15 @@ public class HallHandler extends EntityHandler<Hall> {
             return;
         }
 
-        try {
-            int hallId = parseInt(requestParts[2], out);
-            if (hallId != -1) {
-                Hall hall = hallService.getById(hallId);
-                if (hall != null) {
-                    hallService.delete(hallId);
-                    out.println("HALL_DELETED");
-                } else {
-                    out.println("HALL_NOT_FOUND");
-                }
+        int hallId = parseInt(requestParts[2], out);
+        if (hallId != -1) {
+            Hall hall = hallService.getById(hallId);
+            if (hall != null) {
+                hallService.delete(hallId);
+                out.println("HALL_DELETED");
+            } else {
+                sendError(out, "Зал не найден");
             }
-        } catch (Exception e) {
-            sendError(out, "Ошибка при удалении зала: " + e.getMessage());
         }
     }
 
@@ -62,33 +56,24 @@ public class HallHandler extends EntityHandler<Hall> {
             return;
         }
 
-        try {
-            int hallId = parseInt(requestParts[2], out);
-            if (hallId != -1) {
-                Hall hall = hallService.getById(hallId);
-                if (hall != null) {
-                    out.println("HALL_FOUND;" + hall.getId() + ";" + hall.getName() + ";" + hall.getCapacity());
-                } else {
-                    sendError(out, "Зал не найден");
-                }
-            }
-        } catch (Exception e) {
-            sendError(out, "Ошибка при поиске зала: " + e.getMessage());
+        String queryParam = String.join(" ", Arrays.copyOfRange(requestParts, 2, requestParts.length)).trim();
+        Hall hall = queryParam.matches("\\d+") ? hallService.getById(parseInt(queryParam, out)) : hallService.getByTitle(queryParam);
+
+        if (hall != null) {
+            out.println("HALL_FOUND;" + hall.getId() + ";" + hall.getName() + ";" + hall.getCapacity());
+        } else {
+            sendError(out, "Зал не найден");
         }
     }
 
     @Override
     protected void getAllEntities(PrintWriter out) {
-        try {
-            List<Hall> halls = hallService.getAll();
-            if (halls.isEmpty()) {
-                sendError(out, "Залы не найдены");
-            } else {
-                halls.forEach(hall -> out.println("HALL_FOUND;" + hall.getId() + ";" + hall.getName() + ";" + hall.getCapacity()));
-                out.println("END_OF_HALLS");
-            }
-        } catch (Exception e) {
-            sendError(out, "Ошибка при получении залов: " + e.getMessage());
+        List<Hall> halls = hallService.getAll();
+        if (halls.isEmpty()) {
+            sendError(out, "Залы не найдены");
+        } else {
+            halls.forEach(hall -> out.println("HALL_FOUND;" + hall.getId() + ";" + hall.getName() + ";" + hall.getCapacity()));
+            out.println("END_OF_HALLS");
         }
     }
 
@@ -102,8 +87,6 @@ public class HallHandler extends EntityHandler<Hall> {
             int hallId = Integer.parseInt(requestParts[2]);
             String name = requestParts[3];
             int capacity = parseInt(requestParts[4], out);
-            if (capacity == -1) return null;
-
             if (capacity < 0) {
                 sendError(out, "Вместимость не может быть отрицательной");
                 return null;
@@ -111,7 +94,7 @@ public class HallHandler extends EntityHandler<Hall> {
 
             return new Hall(hallId, name, capacity);
         } catch (Exception e) {
-            sendError(out, "Ошибка при обработке данных для зала: " + e.getMessage());
+            sendError(out, "Ошибка при обработке данных для зала");
             return null;
         }
     }

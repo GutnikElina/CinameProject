@@ -3,6 +3,7 @@ package Models;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,4 +26,7 @@ public class FilmSession {
 
     @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;      // Дата и время окончания сеанса
+
+    @Column(name = "price", nullable = false)
+    private BigDecimal price;               // Цена билета на сеанс
 }

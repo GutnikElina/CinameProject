@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="600.0" prefWidth="800.0" spacing="20" style="-fx-background-color: #8d85a6;" xmlns="http://javafx.com/javafx/17.0.13" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Admin.TicketActions.UpdateTicket">
+    <Label alignment="CENTER" prefHeight="95.0" prefWidth="315.0" text="Обновление билетов">
+        <font>
+            <Font name="Segoe UI Semibold" size="27.0" />
+        </font>
+        <VBox.margin>
+            <Insets left="250.0" top="50.0" />
+        </VBox.margin>
+    </Label>
+
+    <GridPane hgap="10" vgap="15">
+        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="232.0" text="ID билета:" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Label>
+        <TextField fx:id="ticketIdField" prefHeight="34.0" prefWidth="200.0" promptText="Введите ID билета" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="231.0" text="Сеанс:" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Label>
+        <ComboBox fx:id="sessionComboBox" prefHeight="31.0" prefWidth="337.0" promptText="Выберите сеанс:" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="231.0" text="Пользователь:" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Label>
+        <ComboBox fx:id="userComboBox" prefHeight="31.0" prefWidth="337.0" promptText="Выберите пользователя:" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+
+        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="232.0" text="Место:" GridPane.columnIndex="0" GridPane.rowIndex="3">
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Label>
+        <TextField fx:id="seatNumberField" prefHeight="34.0" prefWidth="200.0" promptText="Введите номер места" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="232.0" text="Цена:" GridPane.columnIndex="0" GridPane.rowIndex="4">
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Label>
+        <TextField fx:id="priceField" prefHeight="34.0" prefWidth="200.0" promptText="Введите цену билета" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="231.0" text="Статус:" GridPane.columnIndex="0" GridPane.rowIndex="5">
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Label>
+        <ComboBox fx:id="statusComboBox" prefHeight="31.0" prefWidth="337.0" promptText="Выберите статус:" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="231.0" text="Тип запроса:" GridPane.columnIndex="0" GridPane.rowIndex="6">
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Label>
+        <ComboBox fx:id="requestTypeComboBox" prefHeight="31.0" prefWidth="337.0" promptText="Выберите тип запроса:" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+        <columnConstraints>
+         <ColumnConstraints />
+         <ColumnConstraints />
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+      </rowConstraints>
+    </GridPane>
+
+    <HBox alignment="CENTER" spacing="20">
+        <Button contentDisplay="CENTER" onAction="#updateTicketAction" prefHeight="33.0" prefWidth="161.0" styleClass="enter" text="Обновить билет" textAlignment="CENTER">
+         <HBox.margin>
+            <Insets left="20.0" />
+         </HBox.margin>
+         <font>
+            <Font name="Segoe UI Semibold" size="14.0" />
+         </font></Button>
+        <Button fx:id="backButton" onAction="#handleBackButton" prefHeight="31.0" prefWidth="151.0" styleClass="button" text="Назад">
+         <font>
+            <Font name="Segoe UI Semibold" size="14.0" />
+         </font></Button>
+    </HBox>
+</VBox>

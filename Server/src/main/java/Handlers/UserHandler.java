@@ -6,6 +6,7 @@ import Services.UserService;
 import lombok.AllArgsConstructor;
 
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.List;
 
 @AllArgsConstructor
@@ -78,7 +79,19 @@ public class UserHandler extends EntityHandler<User> {
 
     @Override
     protected void getEntity(String[] requestParts, PrintWriter out) {
-        if (requestParts.length < 3) {
+        if (requestParts[1].equals("GET_CURRENT")) {
+            String token = requestParts.length > 2 ? requestParts[2] : null;
+            if (token == null || token.isEmpty()) {
+                sendError(out, "Токен не предоставлен");
+                return;
+            }
+            User currentUser = authService.getCurrentUser(token);
+            if (currentUser != null) {
+                out.println("USER_FOUND;" + currentUser.getId() + ";" + currentUser.getUsername() + ";" + currentUser.getRole() + ";" + currentUser.getCreatedAt());
+            } else {
+                sendError(out, "Текущий пользователь не найден или токен недействителен");
+            }
+        } else if (requestParts.length < 3) {
             sendError(out, "Не указан ID пользователя");
             return;
         }

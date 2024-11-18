@@ -11,10 +11,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Ticket {
-    private int id;                         // Уникальный идентификатор билета
-    private int sessionId;                  // Идентификатор сеанса, на который приобретён билет
-    private int userId;                     // Идентификатор пользователя, купившего билет
+    private Integer id;                     // Уникальный идентификатор билета
+    private Integer sessionId;              // Идентификатор сеанса, на который приобретён билет
+    private Integer userId;                 // Идентификатор пользователя, купившего билет
     private String seatNumber;              // Номер места, которое занимает билет
-    private LocalDateTime purchaseTime;     // Дата и время покупки билета
     private BigDecimal price;               // Цена билета
+    private String status;                  // Новый статус билета ("PENDING", "CONFIRMED", "CANCELLED", "EXCHANGED")
+    private String requestType;             // Тип запроса ("PURCHASE", "CANCEL", "EXCHANGE")
+    private LocalDateTime purchaseTime;     // Дата и время покупки билета
 }

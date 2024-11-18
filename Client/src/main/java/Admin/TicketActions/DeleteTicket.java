@@ -3,6 +3,8 @@ package Admin.TicketActions;
 import Utils.AppUtils;
 import Utils.UIUtils;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -11,30 +13,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class DeleteTicket extends Application {
+public class DeleteTicket {
+
+    @FXML
     private TextField ticketIdField;
+    @FXML
+    private Button backButton;
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Удалить билет");
-
-        ticketIdField = new TextField();
-        ticketIdField.setPromptText("Введите ID билета");
-
-        Button deleteButton = new Button("Удалить билет");
-        deleteButton.setOnAction(e -> deleteTicketAction(primaryStage));
-
-        VBox vbox = new VBox(10, ticketIdField, deleteButton);
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setStyle("-fx-padding: 20;");
-
-        Scene scene = new Scene(vbox, 300, 200);
-        scene.getStylesheets().add("/style.css");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
-    private void deleteTicketAction(Stage stage) {
+    @FXML
+    private void deleteTicketAction() {
         try {
             String ticketIdStr = ticketIdField.getText();
 
@@ -49,13 +36,13 @@ public class DeleteTicket extends Application {
 
             if (response.startsWith("SUCCESS")) {
                 UIUtils.showAlert("Успех", "Билет удален", Alert.AlertType.INFORMATION);
-                stage.close();
+                handleBackButton();
             } else if (response.equals("TICKET_NOT_FOUND")) {
                 UIUtils.showAlert("Ошибка", "Билет с таким ID не найден", Alert.AlertType.ERROR);
-                stage.close();
+                handleBackButton();
             } else {
                 UIUtils.showAlert("Ошибка", "Не удалось удалить билет: " + response, Alert.AlertType.ERROR);
-                stage.close();
+                handleBackButton();
             }
 
         } catch (NumberFormatException e) {
@@ -63,5 +50,11 @@ public class DeleteTicket extends Application {
         } catch (Exception e) {
             UIUtils.showAlert("Ошибка", "Не удалось удалить билет: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    @FXML
+    private void handleBackButton() {
+        Stage stage = (Stage) ticketIdField.getScene().getWindow();
+        stage.close();
     }
 }

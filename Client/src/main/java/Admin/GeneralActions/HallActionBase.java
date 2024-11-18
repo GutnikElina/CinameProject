@@ -15,7 +15,7 @@ public abstract class HallActionBase {
             AppUtils.showAlert("Ошибка", "Произошла ошибка.", Alert.AlertType.ERROR);
         } else {
             AppUtils.showAlert("Успех", "Операция выполнена успешно.", Alert.AlertType.INFORMATION);
-            stage.close();
+            if (stage!=null) stage.close();
         }
     }
 }

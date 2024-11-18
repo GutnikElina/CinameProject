@@ -48,4 +48,19 @@ public class TicketService extends BaseService implements Repository<Ticket> {
             return query.uniqueResult() > 0;
         });
     }
+
+    public int getHallCapacity(int sessionId) {
+        return executeTransactionWithResult(session -> {
+            Query<Integer> query = session.createQuery(
+                    "SELECT h.capacity FROM FilmSession s JOIN Hall h ON s.hallId = h.id WHERE s.id = :sessionId", Integer.class);
+            query.setParameter("sessionId", sessionId);
+
+            Integer capacity = query.uniqueResult();
+            if (capacity == null) {
+                throw new IllegalArgumentException("Вместимость зала не найдена для данного сеанса: " + sessionId);
+            }
+            return capacity;
+        });
+    }
+
 }

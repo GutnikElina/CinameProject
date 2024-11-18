@@ -9,6 +9,7 @@ import Services.SessionService;
 import lombok.AllArgsConstructor;
 
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -22,28 +23,39 @@ public class SessionHandler extends EntityHandler<FilmSession> {
     @Override
     protected void addEntity(String[] requestParts, PrintWriter out) {
         try {
+            if (requestParts.length < 7) {
+                throw new IllegalArgumentException("Недостаточно данных для добавления сеанса.");
+            }
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDateTime startTime = LocalDateTime.parse(requestParts[2], formatter);
             LocalDateTime endTime = LocalDateTime.parse(requestParts[3], formatter);
             int movieId = Integer.parseInt(requestParts[4]);
             int hallId = Integer.parseInt(requestParts[5]);
+            BigDecimal price = BigDecimal.valueOf(Long.parseLong(requestParts[6]));
+
+            if (endTime.isBefore(startTime)) {
+                throw new IllegalArgumentException("Время окончания не может быть раньше времени начала.");
+            }
 
             FilmSession filmSession = new FilmSession();
             filmSession.setStartTime(startTime);
             filmSession.setEndTime(endTime);
             filmSession.setMovieId(movieId);
             filmSession.setHallId(hallId);
+            filmSession.setPrice(price);
 
             sessionService.add(filmSession);
+
             out.println("SUCCESS: Сеанс добавлен");
         } catch (Exception e) {
             sendError(out, "Не удалось добавить сеанс: " + e.getMessage());
         }
     }
 
+
     @Override
     protected void updateEntity(String[] requestParts, PrintWriter out) {
-        if (requestParts.length < 7) {
+        if (requestParts.length < 8) {
             sendError(out, "Недостаточно данных для обновления сеанса");
             return;
         }
@@ -55,6 +67,7 @@ public class SessionHandler extends EntityHandler<FilmSession> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDateTime startTime = LocalDateTime.parse(requestParts[5], formatter);
             LocalDateTime endTime = LocalDateTime.parse(requestParts[6], formatter);
+            BigDecimal price = BigDecimal.valueOf(Long.parseLong(requestParts[7]));
 
             if (startTime.isAfter(endTime)) {
                 sendError(out, "Время окончания сеанса не может быть раньше времени начала.");
@@ -71,6 +84,7 @@ public class SessionHandler extends EntityHandler<FilmSession> {
             filmSession.setHallId(hallId);
             filmSession.setStartTime(startTime);
             filmSession.setEndTime(endTime);
+            filmSession.setPrice(price);
 
             sessionService.update(filmSession);
             out.println("SUCCESS: Сеанс обновлен");
@@ -121,12 +135,13 @@ public class SessionHandler extends EntityHandler<FilmSession> {
 
                 String movieTitle = movie.getTitle();
                 String hallName = hall.getName();
-                out.printf("SESSION_FOUND;%d;%s;%s;%s;%s%n",
+                out.printf("SESSION_FOUND;%d;%s;%s;%s;%s;%s%n",
                         session.getId(),
                         movieTitle,
                         hallName,
                         session.getStartTime(),
-                        session.getEndTime());
+                        session.getEndTime(),
+                        session.getPrice());
             }
         } catch (NumberFormatException e) {
             sendError(out, "Неверный формат ID: " + requestParts[2]);
@@ -150,12 +165,13 @@ public class SessionHandler extends EntityHandler<FilmSession> {
                 Hall hall = hallService.getById(session.getHallId());
                 String movieTitle = movie.getTitle();
                 String hallName = hall.getName();
-                out.printf("SESSION_FOUND;%d;%s;%s;%s;%s%n",
+                out.printf("SESSION_FOUND;%d;%s;%s;%s;%s;%s%n",
                         session.getId(),
                         movieTitle,
                         hallName,
                         session.getStartTime(),
-                        session.getEndTime());
+                        session.getEndTime(),
+                        session.getPrice());
             }
             out.println("END_OF_SESSIONS");
         } catch (Exception e) {

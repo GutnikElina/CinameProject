@@ -46,5 +46,4 @@ public class MovieService extends BaseService implements Repository<Movie> {
             return query.uniqueResult();
         });
     }
-
 }

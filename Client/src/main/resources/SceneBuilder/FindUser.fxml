@@ -41,7 +41,7 @@
                 <Font size="13.0" />
             </font>
         </TextField>
-        <Button onAction="#fetchUserDetails" prefHeight="28.0" prefWidth="133.0" style="-fx-background-color: #9cd18c;" text="Получить данные" textAlignment="CENTER">
+        <Button onAction="#fetchUserDetails" prefHeight="28.0" prefWidth="133.0" styleClass="enter" text="Получить данные" textAlignment="CENTER">
             <font>
                 <Font name="Segoe UI Semibold" size="13.0" />
             </font>
@@ -78,7 +78,7 @@
          </rowConstraints>
         </GridPane>
     </HBox>
-    <Button fx:id="backButton" alignment="CENTER" contentDisplay="CENTER" onAction="#handleBackButton" prefHeight="32.0" prefWidth="139.0" style="-fx-background-color: #d58c84;" styleClass="button" text="Назад" textAlignment="CENTER">
+    <Button fx:id="backButton" alignment="CENTER" contentDisplay="CENTER" onAction="#handleBackButton" prefHeight="32.0" prefWidth="139.0" styleClass="button" text="Назад" textAlignment="CENTER">
         <VBox.margin>
             <Insets left="330.0" />
         </VBox.margin>

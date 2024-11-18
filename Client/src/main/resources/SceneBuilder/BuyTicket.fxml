@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="600.0" prefWidth="800.0" spacing="20" style="-fx-background-color: #8d85a6;" xmlns="http://javafx.com/javafx/17.0.13" xmlns:fx="http://javafx.com/fxml/1" fx:controller="User.BuyTicket">
+    <Label alignment="CENTER" prefHeight="112.0" prefWidth="476.0" text="Покупка билета в кинотеатр">
+        <font>
+            <Font name="Segoe UI Semibold" size="32.0" />
+        </font>
+        <VBox.margin>
+            <Insets left="170.0" top="50.0" />
+        </VBox.margin>
+    </Label>
+    <GridPane hgap="10" vgap="15">
+        <Label alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="281.0" text="Сеанс:" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Label>
+        <ComboBox fx:id="sessionComboBox" prefHeight="35.0" prefWidth="282.0" promptText="Выберите сеанс:" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="279.0" text="Номер места:" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Label>
+        <TextField fx:id="seatNumberField" prefHeight="41.0" prefWidth="282.0" promptText="Введите номер места" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+        <columnConstraints>
+         <ColumnConstraints />
+         <ColumnConstraints />
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+      </rowConstraints>
+
+    </GridPane>
+
+    <HBox alignment="CENTER" spacing="20">
+        <Button fx:id="buyButton" prefHeight="41.0" prefWidth="191.0" styleClass="enter" text="Добавить билет">
+            <HBox.margin>
+                <Insets left="10.0" />
+            </HBox.margin>
+            <font>
+                <Font name="Segoe UI Semibold" size="14.0" />
+            </font>
+        </Button>
+    </HBox>
+
+     <Button fx:id="checkAvailabilityButton" prefHeight="39.0" prefWidth="190.0" styleClass="manage" text="Проверить доступность">
+         <font>
+             <Font name="Segoe UI Semibold" size="14.0" />
+         </font>
+      <VBox.margin>
+         <Insets left="310.0" />
+      </VBox.margin>
+     </Button>
+
+     <Button fx:id="backButton" onAction="#handleBackButton" prefHeight="39.0" prefWidth="191.0" styleClass="button" text="Назад">
+         <font>
+             <Font name="Segoe UI Semibold" size="14.0" />
+         </font>
+      <VBox.margin>
+         <Insets left="310.0" />
+      </VBox.margin>
+     </Button>
+</VBox>

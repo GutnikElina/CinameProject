@@ -2,6 +2,7 @@ package Admin.TicketActions;
 
 import Utils.AppUtils;
 import javafx.application.Application;
+import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -18,43 +19,28 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetAllTickets extends Application {
+public class GetAllTickets {
 
+    @FXML
     private ListView<String> ticketsListView;
+    @FXML
     private Button backButton;
-
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm");
+    private String command = "TICKET;GET_ALL;";
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Все билеты");
-
-        ticketsListView = new ListView<>();
-        ticketsListView.setPrefHeight(300);
-
-        backButton = new Button("Назад");
-        backButton.setOnAction(e -> primaryStage.close());
-
-        VBox root = new VBox(20);
-        root.setPadding(new Insets(20));
-        root.getChildren().addAll(ticketsListView, backButton);
-
+    @FXML
+    private void initialize() {
         fetchAllTickets();
-
-        Scene scene = new Scene(root, 800, 500);
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        backButton.setOnAction(e -> handleBackButton());
     }
 
+    @FXML
     private void fetchAllTickets() {
-        String message = "TICKET;GET_ALL;";
-
         try (Socket socket = new Socket("localhost", 12345);
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-            out.println(message);
+            out.println(command);
 
             String response;
             List<String> tickets = new ArrayList<>();
@@ -66,13 +52,17 @@ public class GetAllTickets extends Application {
                     String[] ticketData = response.split(";");
                     String ticketId = ticketData[1];
                     String sessionId = ticketData[2];
-                    String seatNumber = ticketData[3];
                     String userId = ticketData[4];
+                    String seatNumber = ticketData[3];
                     String price = ticketData[5];
-                    String purchaseTime = formatDateTime(ticketData[6]);
+                    String status = ticketData[6];
+                    String requestType = ticketData[7];
+                    String purchaseTime = formatDateTime(ticketData[8]);
 
-                    tickets.add(String.format("ID билета: %s\nID сеанса: %s\nМесто: %s\nID пользователя: %s\nЦена: %s\nВремя покупки: %s",
-                            ticketId, sessionId, seatNumber, userId, price, purchaseTime));
+                    tickets.add(String.format(
+                            "ID билета: %s\nID сеанса: %s\nID пользователя: %s\nМесто: %s\nЦена: %s\nСтатус: %s\nТип запроса: %s\nВремя покупки: %s",
+                            ticketId, sessionId, userId, seatNumber, price, status, requestType, purchaseTime
+                    ));
                 } else if (response.startsWith("ERROR;")) {
                     AppUtils.showAlert("Ошибка", "Не удалось получить данные о билетах.", Alert.AlertType.ERROR);
                     break;
@@ -104,7 +94,9 @@ public class GetAllTickets extends Application {
         }
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    @FXML
+    private void handleBackButton() {
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.close();
     }
 }

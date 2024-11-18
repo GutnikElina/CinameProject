@@ -2,40 +2,22 @@ package Admin.SessionActions;
 
 import Utils.AppUtils;
 import Utils.UIUtils;
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import javafx.scene.layout.VBox;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Alert;
+import javafx.stage.Stage;
 
-public class DeleteSession extends Application {
+public class DeleteSession {
 
+    @FXML
     private TextField sessionIdField;
+    @FXML
+    private Button backButton;
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Удалить сеанс");
-
-        sessionIdField = new TextField();
-        sessionIdField.setPromptText("Введите ID сеанса");
-
-        Button deleteButton = new Button("Удалить сеанс");
-        deleteButton.setOnAction(e -> deleteSessionAction(primaryStage));
-
-        VBox vbox = new VBox(10, sessionIdField, deleteButton);
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setStyle("-fx-padding: 20;");
-
-        Scene scene = new Scene(vbox, 300, 200);
-        scene.getStylesheets().add("/style.css");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
-    private void deleteSessionAction(Stage stage) {
+    @FXML
+    private void deleteSessionAction() {
         try {
             String sessionIdStr = sessionIdField.getText();
 
@@ -50,13 +32,13 @@ public class DeleteSession extends Application {
 
             if (response.startsWith("SUCCESS")) {
                 UIUtils.showAlert("Успех", "Сеанс удален", Alert.AlertType.INFORMATION);
-                stage.close();
+                closeStage();
             } else if (response.equals("SESSION_NOT_FOUND")) {
                 UIUtils.showAlert("Ошибка", "Сеанс с таким ID не найден", Alert.AlertType.ERROR);
-                stage.close();
+                closeStage();
             } else {
                 UIUtils.showAlert("Ошибка", "Не удалось удалить сеанс: " + response, Alert.AlertType.ERROR);
-                stage.close();
+                closeStage();
             }
 
         } catch (NumberFormatException e) {
@@ -64,5 +46,15 @@ public class DeleteSession extends Application {
         } catch (Exception e) {
             UIUtils.showAlert("Ошибка", "Не удалось удалить сеанс: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    @FXML
+    private void handleBackButton(ActionEvent event) {
+        closeStage();
+    }
+
+    private void closeStage() {
+        Stage stage = (Stage) sessionIdField.getScene().getWindow();
+        stage.close();
     }
 }

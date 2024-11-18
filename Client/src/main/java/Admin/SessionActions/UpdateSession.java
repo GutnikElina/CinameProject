@@ -4,132 +4,100 @@ import Models.Session;
 import Utils.AppUtils;
 import Utils.FieldValidator;
 import Utils.UIUtils;
-import javafx.application.Application;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
-import javafx.scene.layout.VBox;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UpdateSession extends Application {
+public class UpdateSession{
 
+    @FXML
     private TextField idField, startTimeField, endTimeField;
+
+    @FXML
     private ComboBox<String> movieComboBox, hallComboBox;
-    private Map<String, Integer> movieIdMap = new HashMap<>();
-    private Map<String, Integer> hallIdMap = new HashMap<>();
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Обновить сеанс");
+    private final Map<String, Integer> movieIdMap = new HashMap<>();
+    private final Map<String, Integer> hallIdMap = new HashMap<>();
 
-        idField = UIUtils.createTextField("Введите ID сеанса");
-        startTimeField = UIUtils.createTextField("Введите время начала сеанса (yyyy-MM-dd HH:mm)");
-        endTimeField = UIUtils.createTextField("Введите время окончания сеанса (yyyy-MM-dd HH:mm)");
-
-        movieComboBox = new ComboBox<>();
-        hallComboBox = new ComboBox<>();
-
+    @FXML
+    private void initialize() {
         loadMovieAndHallData();
-
-        VBox vbox = UIUtils.createVBox(15, Pos.CENTER,
-                UIUtils.createLabel("Обновление сеанса", 18),
-                idField, movieComboBox, hallComboBox, startTimeField, endTimeField,
-                UIUtils.createButton("Обновить сеанс", 150, e -> updateSessionAction(primaryStage), false));
-
-        Scene scene = new Scene(vbox, 800, 500);
-        scene.getStylesheets().add("/style.css");
-        primaryStage.setScene(scene);
-        primaryStage.show();
     }
 
     private void loadMovieAndHallData() {
-        String movieCommand = "MOVIE;GET_ALL";
-        String movieResponse = AppUtils.sendToServerAndGetFullResponse(movieCommand);
+        String movieResponse = AppUtils.sendToServerAndGetFullResponse("MOVIE;GET_ALL");
         if (movieResponse.startsWith("MOVIE_FOUND")) {
-            String[] movieLines = movieResponse.split("\n");
-            for (String line : movieLines) {
+            for (String line : movieResponse.split("\n")) {
                 if (line.startsWith("MOVIE_FOUND")) {
-                    String[] movieParts = line.split(";");
-                    String movieTitle = movieParts[2];
-                    Integer movieId = Integer.parseInt(movieParts[1]);
+                    String[] parts = line.split(";");
+                    String movieTitle = parts[2];
+                    int movieId = Integer.parseInt(parts[1]);
                     movieComboBox.getItems().add(movieTitle);
                     movieIdMap.put(movieTitle, movieId);
                 }
             }
         } else {
-            UIUtils.showAlert("Ошибка", "Не удалось загрузить фильмы: " + movieResponse, Alert.AlertType.ERROR);
+            UIUtils.showAlert("Ошибка", "Не удалось загрузить фильмы.", Alert.AlertType.ERROR);
         }
 
-        String hallCommand = "HALL;GET_ALL";
-        String hallResponse = AppUtils.sendToServerAndGetFullResponse(hallCommand);
+        String hallResponse = AppUtils.sendToServerAndGetFullResponse("HALL;GET_ALL");
         if (hallResponse.startsWith("HALL_FOUND")) {
-            String[] hallLines = hallResponse.split("\n");
-            for (String line : hallLines) {
+            for (String line : hallResponse.split("\n")) {
                 if (line.startsWith("HALL_FOUND")) {
-                    String[] hallParts = line.split(";");
-                    String hallName = hallParts[2];
-                    Integer hallId = Integer.parseInt(hallParts[1]);
+                    String[] parts = line.split(";");
+                    String hallName = parts[2];
+                    int hallId = Integer.parseInt(parts[1]);
                     hallComboBox.getItems().add(hallName);
                     hallIdMap.put(hallName, hallId);
                 }
             }
         } else {
-            UIUtils.showAlert("Ошибка", "Не удалось загрузить залы: " + hallResponse, Alert.AlertType.ERROR);
+            UIUtils.showAlert("Ошибка", "Не удалось загрузить залы.", Alert.AlertType.ERROR);
         }
     }
 
-    private void updateSessionAction(Stage stage) {
-        boolean valid = FieldValidator.validateNumericField(idField, "Пожалуйста, введите корректный ID сеанса.")
-                && FieldValidator.validateTextField(startTimeField, "Время начала сеанса должно быть в формате yyyy-MM-dd HH:mm", 1)
-                && FieldValidator.validateTextField(endTimeField, "Время окончания сеанса должно быть в формате yyyy-MM-dd HH:mm", 1);
+    @FXML
+    private void updateSessionAction() {
+        if (!FieldValidator.validateNumericField(idField, "Введите корректный ID сеанса.") ||
+                !FieldValidator.validateTextField(startTimeField, "Введите корректное время начала (yyyy-MM-dd HH:mm).", 1) ||
+                !FieldValidator.validateTextField(endTimeField, "Введите корректное время окончания (yyyy-MM-dd HH:mm).", 1)) {
+            return;
+        }
 
         if (movieComboBox.getValue() == null || hallComboBox.getValue() == null) {
-            UIUtils.showAlert("Ошибка", "Пожалуйста, выберите фильм и зал.", Alert.AlertType.ERROR);
-            valid = false;
+            UIUtils.showAlert("Ошибка", "Выберите фильм и зал.", Alert.AlertType.ERROR);
+            return;
         }
 
-        if (valid) {
-            Session session = createSessionFromInput();
-            sendSessionUpdateCommand(session, stage);
-        } else {
-            UIUtils.showAlert("Ошибка", "Пожалуйста, исправьте ошибки в форме.", Alert.AlertType.ERROR);
-        }
-    }
-
-    private Session createSessionFromInput() {
         Session session = new Session();
         session.setId(Integer.parseInt(idField.getText()));
         session.setMovieId(movieIdMap.get(movieComboBox.getValue()));
         session.setHallId(hallIdMap.get(hallComboBox.getValue()));
-        LocalDateTime startTime = LocalDateTime.parse(startTimeField.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        LocalDateTime endTime = LocalDateTime.parse(endTimeField.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        session.setStartTime(startTime);
-        session.setEndTime(endTime);
-        return session;
-    }
+        session.setStartTime(LocalDateTime.parse(startTimeField.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        session.setEndTime(LocalDateTime.parse(endTimeField.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
 
-
-    private void sendSessionUpdateCommand(Session session, Stage stage) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        String formattedStartTime = session.getStartTime().format(formatter);
-        String formattedEndTime = session.getEndTime().format(formatter);
-
-        String command = String.format("SESSION;UPDATE;%d;%d;%d;%s;%s", session.getId(), session.getMovieId(), session.getHallId(),
-                formattedStartTime, formattedEndTime);
+        String command = String.format("SESSION;UPDATE;%d;%d;%d;%s;%s",
+                session.getId(),
+                session.getMovieId(),
+                session.getHallId(),
+                session.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                session.getEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
 
         String response = AppUtils.sendToServer(command);
-
         if (response.contains("ERROR")) {
-            AppUtils.showAlert("Ошибка", "Произошла ошибка при отправке команды на сервер: " + response, Alert.AlertType.ERROR);
+            UIUtils.showAlert("Ошибка", "Ошибка при обновлении сеанса: " + response, Alert.AlertType.ERROR);
         } else {
-            AppUtils.showAlert("Успех", "Сеанс обновлен успешно.", Alert.AlertType.INFORMATION);
-            if (stage != null) stage.close();
+            UIUtils.showAlert("Успех", "Сеанс успешно обновлен.", Alert.AlertType.INFORMATION);
+            handleBackButton();
         }
+    }
+
+    @FXML
+    private void handleBackButton() {
+        ((Stage) idField.getScene().getWindow()).close();
     }
 }
