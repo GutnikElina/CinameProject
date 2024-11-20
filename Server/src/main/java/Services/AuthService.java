@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.hibernate.query.Query;
 import javax.crypto.SecretKey;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -22,20 +23,24 @@ public class AuthService extends BaseService {
                 Query<User> query = session.createQuery("FROM User u WHERE u.username = :username", User.class);
                 query.setParameter("username", user.getUsername());
                 User existingUser = query.uniqueResult();
+                System.out.println(existingUser);
 
                 if (existingUser != null) {
                     logger.warning("Пользователь уже существует: " + user.getUsername());
-                    return false;
+                    return Boolean.FALSE;
                 }
 
                 user.setRole("guest");
                 String token = generateToken(user.getUsername(), user.getRole());
                 user.setToken(token);
+                user.setCreatedAt(LocalDateTime.now());
                 session.save(user);
-                return true;
+
+                return Boolean.TRUE;
+
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Ошибка при регистрации пользователя: " + user.getUsername(), e);
-                throw e;
+                return Boolean.FALSE;
             }
         });
     }
@@ -95,7 +100,7 @@ public class AuthService extends BaseService {
                     .setSubject(username)
                     .claim("role", role)
                     .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 день
+                    .setExpiration(new Date(System.currentTimeMillis() + 86400000))
                     .signWith(SECRET_KEY)
                     .compact();
             return token;

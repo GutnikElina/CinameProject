@@ -9,18 +9,12 @@ import javafx.stage.Stage;
 
 public class ManageMovies {
 
-    @FXML
-    private Button addFilms;
-    @FXML
-    private Button deleteFilms;
-    @FXML
-    private Button findFilms;
-    @FXML
-    private Button getAllFilms;
-    @FXML
-    private Button updateFilms;
-    @FXML
-    private Button out;
+    @FXML private Button addFilms;
+    @FXML private Button deleteFilms;
+    @FXML private Button findFilms;
+    @FXML private Button getAllFilms;
+    @FXML private Button updateFilms;
+    @FXML private Button out;
 
     @FXML
     private void initialize() {

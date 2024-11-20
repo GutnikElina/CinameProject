@@ -1,30 +1,23 @@
 package Admin.HallActions;
 
 import Admin.GeneralActions.HallActionBase;
-import Admin.GeneralActions.UserActionBase;
 import Models.Hall;
-import Models.User;
 import Utils.AppUtils;
-import Utils.FieldValidator;
-import Utils.UIUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.scene.control.Alert;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Button;
 import javafx.stage.Stage;
-
-import java.time.LocalDateTime;
+import Models.RequestDTO;
+import Models.ResponseDTO;
+import java.util.Map;
 
 public class FindHall extends HallActionBase {
-
-    @FXML
-    private TextField hallIdField;
-    @FXML
-    private Label nameLabel, capacityLabel;
-    @FXML
-    private Button backButton;
+    @FXML private TextField hallIdField;
+    @FXML private Label nameLabel, capacityLabel;
+    @FXML private Button backButton;
 
     @FXML
     private void fetchHallDetails() {
@@ -37,19 +30,33 @@ public class FindHall extends HallActionBase {
     }
 
     private void sendHallFindRequest(int hallId) {
-        String message = "HALL;GET;" + hallId;
-        String response = AppUtils.sendToServer(message);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            RequestDTO request = new RequestDTO();
+            request.setCommand("HALL;GET");
+            request.setData(Map.of("id", String.valueOf(hallId)));
 
-        if (response.startsWith("HALL_FOUND;")) {
-            String[] hallData = response.split(";");
-            Hall hall = new Hall();
-            hall.setId(Integer.parseInt(hallData[1]));
-            hall.setName(hallData[2]);
-            hall.setCapacity(Integer.parseInt(hallData[3]));
+            String jsonRequest = objectMapper.writeValueAsString(request);
 
-            updateHallDetails(hall);
-        } else {
-            AppUtils.showAlert("Ошибка", "Зал не найден.", Alert.AlertType.INFORMATION);
+            String response = AppUtils.sendToServer(jsonRequest);
+
+            if (response.contains("ERROR")) {
+                AppUtils.showAlert("Ошибка", "Зал не найден.", Alert.AlertType.INFORMATION);
+            } else {
+                ResponseDTO responseDTO = objectMapper.readValue(response, ResponseDTO.class);
+                if ("HALL_FOUND".equals(responseDTO.getStatus())) {
+                    Map<String, Object> data = responseDTO.getData();
+                    Hall hall = new Hall();
+                    hall.setId((Integer) data.get("id"));
+                    hall.setName((String) data.get("name"));
+                    hall.setCapacity((Integer) data.get("capacity"));
+                    updateHallDetails(hall);
+                } else {
+                    AppUtils.showAlert("Ошибка", responseDTO.getMessage(), Alert.AlertType.INFORMATION);
+                }
+            }
+        } catch (Exception e) {
+            AppUtils.showAlert("Ошибка", "Не удалось отправить запрос на сервер: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -64,4 +71,3 @@ public class FindHall extends HallActionBase {
         stage.close();
     }
 }
-

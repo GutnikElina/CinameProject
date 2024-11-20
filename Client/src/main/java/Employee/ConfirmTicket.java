@@ -41,8 +41,7 @@ public class ConfirmTicket {
                         confirmButton.setDisable(!ticket.getStatus().equals("PENDING"));
                         confirmButton.setOnAction(e -> confirmTicket(ticket));
 
-                        HBox ticketBox = new HBox(10, ticketLabel, confirmButton);
-                        return ticketBox;
+                        return new HBox(10, ticketLabel, confirmButton);
                     })
                     .collect(Collectors.toList());
 

@@ -3,30 +3,29 @@ package Admin.MovieActions;
 import Models.Movie;
 import Utils.AppUtils;
 import Utils.UIUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import Models.RequestDTO;
+import Models.ResponseDTO;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.Map;
 
 public class FindMovie {
-    @FXML
-    private TextField movieTitleField;
-    @FXML
-    private Label titleLabel, genreLabel, durationLabel, releaseDateLabel;
-    @FXML
-    private TextArea descriptionArea;
-    @FXML
-    private ImageView posterView;
-    @FXML
-    private Button trailerButton;
-    @FXML
-    private Button backButton;
+    @FXML private TextField movieTitleField;
+    @FXML private Label titleLabel, genreLabel, durationLabel, releaseDateLabel;
+    @FXML private TextArea descriptionArea;
+    @FXML private Button backButton;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @FXML
     private void initialize() {
         backButton.setOnAction(e -> handleBackButton());
-        trailerButton.setDisable(true);
     }
 
     @FXML
@@ -44,30 +43,60 @@ public class FindMovie {
             return;
         }
 
-        String response = AppUtils.sendToServer("MOVIE;GET;" + movieTitle);
+        sendMovieFindRequest(movieTitle);
+    }
 
-        if (response == null) {
-            UIUtils.showAlert("Ошибка", "Не удалось подключиться к серверу.", Alert.AlertType.ERROR);
-            return;
+    private void sendMovieFindRequest(String movieTitle) {
+        try {
+            RequestDTO request = new RequestDTO();
+            request.setCommand("MOVIE;GET");
+            request.setData(Map.of("title", movieTitle));
+
+            String jsonRequest = objectMapper.writeValueAsString(request);
+
+            String response = AppUtils.sendToServer(jsonRequest);
+
+            if (response == null) {
+                UIUtils.showAlert("Ошибка", "Не удалось подключиться к серверу.", Alert.AlertType.ERROR);
+                return;
+            }
+
+            handleMovieResponse(response);
+
+        } catch (Exception e) {
+            UIUtils.showAlert("Ошибка", "Произошла ошибка при отправке запроса.", Alert.AlertType.ERROR);
         }
-
-        handleMovieResponse(response);
     }
 
     private void handleMovieResponse(String response) {
-        if (response.startsWith("MOVIE_FOUND;")) {
-            String[] movieData = response.split(";");
-            if (movieData.length >= 9) {
-                Movie movie = new Movie(
-                        Integer.parseInt(movieData[1]), movieData[2], movieData[3],
-                        Integer.parseInt(movieData[4]), movieData[5], movieData[6],
-                        movieData[7], movieData[8]);
+        try {
+            ResponseDTO responseDTO = objectMapper.readValue(response, ResponseDTO.class);
+            System.out.println(responseDTO);
+
+            if ("MOVIE_FOUND".equals(responseDTO.getStatus())) {
+                Map<String, Object> movieData = responseDTO.getData();
+                Movie movie = new Movie();
+                movie.setId((Integer) movieData.get("id"));
+                movie.setTitle((String) movieData.get("title"));
+                movie.setGenre((String) movieData.get("genre"));
+                movie.setDuration((Integer) movieData.get("duration"));
+
+                long releaseDateTimestamp = (Long) movieData.get("releaseDate");
+                String releaseDate = Instant.ofEpochMilli(releaseDateTimestamp)
+                        .atZone(ZoneId.systemDefault())
+                        .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.forLanguageTag("ru"))); // формат с месяцем на русском
+                movie.setReleaseDate(releaseDate);
+
+                movie.setDescription((String) movieData.get("description"));
+
                 updateMovieDetails(movie);
             } else {
-                UIUtils.showAlert("Ошибка", "Получены некорректные данные о фильме.", Alert.AlertType.ERROR);
+                UIUtils.showAlert("Ошибка", responseDTO.getMessage(), Alert.AlertType.INFORMATION);
             }
-        } else {
-            UIUtils.showAlert("Ошибка", "Фильм не найден.", Alert.AlertType.ERROR);
+
+        } catch (Exception e) {
+            UIUtils.showAlert("Ошибка", "Произошла ошибка при обработке ответа от сервера.", Alert.AlertType.ERROR);
+            e.printStackTrace();
         }
     }
 
@@ -77,30 +106,5 @@ public class FindMovie {
         durationLabel.setText(movie.getDuration() + " мин.");
         releaseDateLabel.setText(movie.getReleaseDate());
         descriptionArea.setText(movie.getDescription());
-
-        if (movie.getPoster() != null && !movie.getPoster().isEmpty()) {
-            posterView.setImage(new Image(movie.getPoster()));
-        } else {
-            posterView.setImage(null);
-        }
-
-        String trailerUrl = movie.getTrailerUrl();
-        trailerButton.setDisable(trailerUrl == null || trailerUrl.trim().isEmpty());
-        trailerButton.setUserData(trailerUrl);
-    }
-
-    @FXML
-    private void openTrailer() {
-        try {
-            String trailerUrl = (String) trailerButton.getUserData();
-            if (trailerUrl != null && !trailerUrl.isEmpty()) {
-                AppUtils.openWebPage(trailerUrl);
-            } else {
-                UIUtils.showAlert("Ошибка", "Трейлер недоступен.", Alert.AlertType.WARNING);
-            }
-        } catch (Exception ex) {
-            UIUtils.showAlert("Ошибка", "Ошибка при открытии трейлера.", Alert.AlertType.ERROR);
-            ex.printStackTrace();
-        }
     }
 }

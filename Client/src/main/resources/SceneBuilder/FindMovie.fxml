@@ -79,13 +79,6 @@
             <RowConstraints />
          </rowConstraints>
         </GridPane>
-        <VBox alignment="CENTER" spacing="10" style="-fx-alignment: center; -fx-padding: 6px;">
-            <Button fx:id="trailerButton" disable="true" onAction="#openTrailer" prefHeight="35.0" prefWidth="149.0" style="-fx-background-color: #bdc3c7;" text="Смотреть трейлер">
-            <font>
-               <Font name="Segoe UI Semibold" size="13.0" />
-            </font></Button>
-            <ImageView fx:id="posterView" fitHeight="220.0" style="-fx-fit-height: 200px; -fx-fit-width: 260px;" />
-        </VBox>
     </HBox>
     <Button fx:id="backButton" onAction="#handleBackButton" prefHeight="32.0" prefWidth="139.0" styleClass="button" text="Назад">
       <VBox.margin>

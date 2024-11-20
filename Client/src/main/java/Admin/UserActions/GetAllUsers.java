@@ -15,12 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetAllUsers {
-    @FXML
-    private ListView<String> listView;
-    @FXML
-    private Button backButton;
-
-    private String command = "USER;GET_ALL;";
+    @FXML private ListView<String> listView;
+    @FXML private Button backButton;
 
     @FXML
     private void initialize() {
@@ -33,6 +29,7 @@ public class GetAllUsers {
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
+            String command = "USER;GET_ALL;";
             out.println(command);
 
             List<String> users = new ArrayList<>();
@@ -44,14 +41,14 @@ public class GetAllUsers {
                 if (isValidResponse(response)) {
                     users.add(formatUserResponse(response));
                 } else if (response.startsWith("ERROR;")) {
-                    handleError("Не удалось получить данные.");
+                    handleError();
                     break;
                 }
             }
             updateListView(users);
 
         } catch (IOException e) {
-            handleError("Не удалось получить данные.");
+            handleError();
         }
     }
 
@@ -82,7 +79,7 @@ public class GetAllUsers {
         stage.close();
     }
 
-    private void handleError(String message) {
-        AppUtils.showAlert("Ошибка", message, Alert.AlertType.ERROR);
+    private void handleError() {
+        AppUtils.showAlert("Ошибка", "Не удалось получить данные.", Alert.AlertType.ERROR);
     }
 }

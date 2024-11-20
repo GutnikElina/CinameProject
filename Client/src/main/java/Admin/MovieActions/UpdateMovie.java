@@ -1,26 +1,20 @@
 package Admin.MovieActions;
 
+import Admin.GeneralActions.MovieActionBase;
 import Models.Movie;
-import Utils.AppUtils;
 import Utils.FieldValidator;
-import Utils.UIUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
-public class UpdateMovie {
-    @FXML
-    private TextField idField, titleField, genreField, durationField, posterField, trailerField;
-    @FXML
-    private TextArea descriptionField;
-    @FXML
-    private DatePicker releaseDatePicker;
-    @FXML
-    private Button backButton;
-    @FXML
-    public Button updateButton;
+public class UpdateMovie extends MovieActionBase {
+
+    @FXML private TextField idField, titleField, genreField, durationField;
+    @FXML private TextArea descriptionField;
+    @FXML private DatePicker releaseDatePicker;
+    @FXML private Button backButton;
+    @FXML public Button updateButton;
 
     @FXML
     private void updateMovieAction() {
@@ -28,22 +22,13 @@ public class UpdateMovie {
                 !FieldValidator.validateTextField(titleField, "Название фильма должно быть не менее 2 символов.", 2) ||
                 !FieldValidator.validateTextField(genreField, "Жанр фильма должен быть не менее 2 символов.", 2) ||
                 !FieldValidator.validatePositiveNumericField(durationField, "Продолжительность фильма должна быть положительным числом.") ||
-                releaseDatePicker.getValue() == null ||
-                !FieldValidator.validateUrlField(posterField, "Введите корректный URL постера.") ||
-                !FieldValidator.validateUrlField(trailerField, "Введите корректный URL трейлера.")) {
+                releaseDatePicker.getValue() == null) {
             return;
         }
 
         Movie movie = createMovieFromInput();
-        String response = AppUtils.sendToServer(constructUpdateCommand(movie));
-
-        if ("MOVIE_UPDATED".equals(response)) {
-            UIUtils.showAlert("Фильм обновлен!", "Фильм был успешно обновлен.", Alert.AlertType.INFORMATION);
-            Stage stage = (Stage) idField.getScene().getWindow();
-            stage.close();
-        } else {
-            UIUtils.showAlert("Ошибка", "Не удалось обновить фильм.", Alert.AlertType.ERROR);
-        }
+        Stage stage = (Stage) updateButton.getScene().getWindow();
+        sendMovieCommand("MOVIE;UPDATE", movie, stage);
     }
 
     private Movie createMovieFromInput() {
@@ -55,22 +40,10 @@ public class UpdateMovie {
 
         LocalDate releaseDate = releaseDatePicker.getValue();
         if (releaseDate != null) {
-            movie.setReleaseDate(releaseDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
+            movie.setReleaseDate(releaseDate.toString());
         }
-
-        movie.setPoster(posterField.getText());
-        movie.setTrailerUrl(trailerField.getText());
         movie.setDescription(descriptionField.getText());
         return movie;
-    }
-
-    private String constructUpdateCommand(Movie movie) {
-        return "MOVIE;UPDATE;" + movie.getId() + ";" + movie.getTitle() + ";" +
-                movie.getGenre() + ";" + movie.getDuration() + ";" +
-                (movie.getReleaseDate() != null ? movie.getReleaseDate() : "") + ";" +
-                (movie.getPoster() != null ? movie.getPoster() : "") + ";" +
-                (movie.getTrailerUrl() != null ? movie.getTrailerUrl() : "") + ";" +
-                (movie.getDescription() != null ? movie.getDescription() : "");
     }
 
     @FXML

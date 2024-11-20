@@ -20,6 +20,7 @@ public class AppUtils {
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
             out.println(command);
+
             return in.readLine();
         } catch (Exception e) {
             UIUtils.logError("Ошибка отправки сообщения на сервер", e);
@@ -47,21 +48,6 @@ public class AppUtils {
             return "ERROR;Соединение прервано.";
         }
         return response.toString();
-    }
-
-    public static void openWebPage(String url) {
-        try {
-            if (Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().browse(new URI(url));
-            } else {
-                throw new UnsupportedOperationException("Открытие ссылок не поддерживается.");
-            }
-        } catch (Exception e) {
-            UIUtils.logError("Ошибка при открытии ссылки: " + url, e);
-            Platform.runLater(() ->
-                    UIUtils.showAlert("Ошибка", "Не удалось открыть ссылку: " + url, Alert.AlertType.ERROR)
-            );
-        }
     }
 
     public static int getCurrentUserId(String token) {

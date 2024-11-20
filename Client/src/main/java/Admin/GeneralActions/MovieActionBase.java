@@ -2,22 +2,28 @@ package Admin.GeneralActions;
 
 import Models.Movie;
 import Utils.AppUtils;
-import javafx.application.Application;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 public abstract class MovieActionBase {
 
-    protected void sendMovieCommand(Movie movie, Stage stage) {
-        String command = String.format("MOVIE;ADD;0;%s;%s;%d;%s;%s;%s;%s",
-                movie.getTitle(), movie.getGenre(), movie.getDuration(),
-                movie.getReleaseDate(), movie.getPoster(), movie.getTrailerUrl(), movie.getDescription());
-        String response = AppUtils.sendToServer(command);
-        if (response.contains("ERROR")) {
-            AppUtils.showAlert("Ошибка", "Произошла ошибка.", Alert.AlertType.ERROR);
-        } else {
-            AppUtils.showAlert("Успех", "Операция выполнена успешно.", Alert.AlertType.INFORMATION);
-            if (stage != null) stage.close();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    protected void sendMovieCommand(String action, Movie movie, Stage stage) {
+        try {
+            String movieJson = objectMapper.writeValueAsString(movie);
+            String command = String.format("{\"command\":\"%s\", \"data\":%s}", action, movieJson);
+            String response = AppUtils.sendToServer(command);
+
+            if (response.contains("ERROR")) {
+                AppUtils.showAlert("Ошибка", "Произошла ошибка при обработке фильма.", Alert.AlertType.ERROR);
+            } else {
+                AppUtils.showAlert("Успех", "Операция выполнена успешно.", Alert.AlertType.INFORMATION);
+                if (stage != null) stage.close();
+            }
+        } catch (Exception e) {
+            AppUtils.showAlert("Ошибка", "Не удалось отправить запрос на сервер: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 }

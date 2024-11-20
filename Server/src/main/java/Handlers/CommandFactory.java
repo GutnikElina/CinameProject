@@ -20,6 +20,8 @@ public class CommandFactory {
     }
 
     public CommandHandler getHandler(String command) {
-        return handlers.getOrDefault(command, new ErrorHandler());
+        String[] parts = command.split(";");
+        String mainCommand = parts[0];
+        return handlers.getOrDefault(mainCommand, new ErrorHandler());
     }
 }

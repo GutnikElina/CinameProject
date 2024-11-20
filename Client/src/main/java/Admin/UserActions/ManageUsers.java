@@ -8,18 +8,12 @@ import javafx.stage.Stage;
 
 public class ManageUsers {
 
-    @FXML
-    private Button addUsers;
-    @FXML
-    private Button deleteUsers;
-    @FXML
-    private Button findUsers;
-    @FXML
-    private Button getAllUsers;
-    @FXML
-    private Button updateUsers;
-    @FXML
-    private Button out;
+    @FXML private Button addUsers;
+    @FXML private Button deleteUsers;
+    @FXML private Button findUsers;
+    @FXML private Button getAllUsers;
+    @FXML private Button updateUsers;
+    @FXML private Button out;
 
     @FXML
     private void initialize() {

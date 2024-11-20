@@ -2,22 +2,24 @@ package Elements.Form;
 
 import MainApp.MainApp;
 import Utils.AppUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import Models.RequestDTO;
+
+import java.util.Map;
 
 public class LoginForm {
-    @FXML
-    private TextField usernameField;
-    @FXML
-    private PasswordField passwordField;
-    @FXML
-    private Button loginButton;
-    @FXML
-    private Button backButton;
+    @FXML private TextField usernameField;
+    @FXML private PasswordField passwordField;
+    @FXML private Button loginButton;
+    @FXML private Button backButton;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @FXML
     private void initialize() {
@@ -38,7 +40,16 @@ public class LoginForm {
             return;
         }
 
-        MainApp.getInstance().getServerConnection()
-                .sendMessage("LOGIN;" + username + ";" + password);
+        try {
+            RequestDTO request = new RequestDTO();
+            request.setCommand("LOGIN");
+            request.setData(Map.of("username", username, "password", password));
+
+            String jsonRequest = objectMapper.writeValueAsString(request);
+
+            MainApp.getInstance().getServerConnection().sendMessage(jsonRequest);
+        } catch (Exception e) {
+            AppUtils.showAlert("Ошибка", "Не удалось отправить запрос: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
 }

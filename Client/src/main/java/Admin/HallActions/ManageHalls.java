@@ -8,18 +8,12 @@ import Utils.UIUtils;
 
 public class ManageHalls {
 
-    @FXML
-    private Button addHalls;
-    @FXML
-    private Button deleteHalls;
-    @FXML
-    private Button findHalls;
-    @FXML
-    private Button getAllHalls;
-    @FXML
-    private Button updateHalls;
-    @FXML
-    private Button out;
+    @FXML private Button addHalls;
+    @FXML private Button deleteHalls;
+    @FXML private Button findHalls;
+    @FXML private Button getAllHalls;
+    @FXML private Button updateHalls;
+    @FXML private Button out;
 
     @FXML
     private void initialize() {

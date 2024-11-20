@@ -4,37 +4,46 @@ import Elements.Menu.*;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
+import Models.ResponseDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ResponseProcessor {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     public void handleResponse(String response) {
         if (response == null) return;
+        try {
+            ResponseDTO responseDTO = objectMapper.readValue(response, ResponseDTO.class);
 
-        String[] parts = response.split(";");
-        Platform.runLater(() -> {
-            switch (parts[0]) {
-                case "LOGIN_SUCCESS":
-                    handleLoginSuccess(parts);
-                    break;
-                case "LOGIN_FAILED":
-                    AppUtils.showAlert("Ошибка", "Неправильный логин или пароль.", Alert.AlertType.ERROR);
-                    break;
-                case "REGISTER_SUCCESS":
-                    AppUtils.showAlert("Успешно", "Регистрация прошла успешно!", Alert.AlertType.INFORMATION);
-                    MainMenu.show(new Stage());
-                    break;
-                case "ERROR":
-                    AppUtils.showAlert("Ошибка", parts.length > 1 ? parts[1] : "Неизвестная ошибка", Alert.AlertType.ERROR);
-                    break;
-                default:
-                    AppUtils.showAlert("Ошибка", "Неизвестный ответ от сервера: " + response, Alert.AlertType.ERROR);
-            }
-        });
+            Platform.runLater(() -> {
+                switch (responseDTO.getStatus()) {
+                    case "LOGIN_SUCCESS":
+                        handleLoginSuccess(responseDTO);
+                        break;
+                    case "LOGIN_FAILED":
+                        AppUtils.showAlert("Ошибка", "Неправильный логин или пароль.", Alert.AlertType.ERROR);
+                        break;
+                    case "REGISTER_SUCCESS":
+                        AppUtils.showAlert("Успешно", "Регистрация прошла успешно!", Alert.AlertType.INFORMATION);
+                        MainMenu.show(new Stage());
+                        break;
+                    case "ERROR":
+                        AppUtils.showAlert("Ошибка", responseDTO.getMessage() != null ? responseDTO.getMessage() : "Неизвестная ошибка", Alert.AlertType.ERROR);
+                        break;
+                    default:
+                        AppUtils.showAlert("Ошибка", "Неизвестный ответ от сервера: " + response, Alert.AlertType.ERROR);
+                }
+            });
+        } catch (Exception e) {
+            AppUtils.showAlert("Ошибка", "Не удалось обработать ответ от сервера: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
 
-    private void handleLoginSuccess(String[] parts) {
-        String token = parts[1];
-        String role = parts[2];
+    private void handleLoginSuccess(ResponseDTO responseDTO) {
+        String token = (String) responseDTO.getData().get("token");
+        String role = (String) responseDTO.getData().get("userRole");
+
         switch (role) {
             case "admin":
                 AdminMenu.show(token);

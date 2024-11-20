@@ -33,9 +33,10 @@ public class MovieService extends BaseService implements Repository<Movie> {
     public void delete(int id) {
         executeTransaction(session -> {
             Movie movie = session.get(Movie.class, id);
-            if (movie != null) {
-                session.delete(movie);
+            if (movie == null) {
+                throw new RuntimeException("Movie not found");
             }
+            session.delete(movie);
         });
     }
 

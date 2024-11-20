@@ -29,13 +29,6 @@ public class User {
     @Column(nullable = true)
     private String token;  // Токен пользователя
 
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
-        this.role = "guest";
-        this.createdAt = LocalDateTime.now();
-    }
-
     public User(String username, String password, String role) {
         this.username = username;
         this.password = password;

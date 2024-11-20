@@ -1,46 +1,56 @@
 package Handlers;
 
+import Models.RequestDTO;
+import Models.ResponseDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.PrintWriter;
+import java.util.Map;
+import java.util.Objects;
 
 public abstract class EntityHandler<T> implements CommandHandler {
-    protected abstract void addEntity(String[] requestParts, PrintWriter out);
-    protected abstract void updateEntity(String[] requestParts, PrintWriter out);
-    protected abstract void deleteEntity(String[] requestParts, PrintWriter out);
-    protected abstract void getEntity(String[] requestParts, PrintWriter out);
+    protected final ObjectMapper objectMapper = new ObjectMapper();
+
+    protected abstract void addEntity(RequestDTO request, PrintWriter out);
+    protected abstract void updateEntity(RequestDTO request, PrintWriter out);
+    protected abstract void deleteEntity(RequestDTO request, PrintWriter out);
+    protected abstract void getEntity(RequestDTO request, PrintWriter out);
     protected abstract void getAllEntities(PrintWriter out);
 
-    protected int parseInt(String value, PrintWriter out) {
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            sendError(out, "Некорректные данные");
-            return -1;
-        }
-    }
-
     @Override
-    public void handle(String[] requestParts, PrintWriter out) {
-        if (requestParts == null || requestParts.length < 2) {
-            sendError(out, "Неверный формат запроса");
-            return;
-        }
-
+    public void handle(RequestDTO request, PrintWriter out) {
         try {
-            String command = requestParts[1];
-            switch (command) {
-                case "ADD": addEntity(requestParts, out); break;
-                case "DELETE": deleteEntity(requestParts, out); break;
-                case "UPDATE": updateEntity(requestParts, out); break;
-                case "GET", "CHECK", "GET_CURRENT": getEntity(requestParts, out); break;
-                case "GET_ALL": getAllEntities(out); break;
-                default: sendError(out, "Неизвестная команда!");
+            String command = request.getCommand();
+            String[] parts = command.split(";"); // Разделяем команду по символу ";"
+            String subCommand = parts.length > 1 ? parts[1] : null; // Подкоманда (например, GET)
+
+            switch (Objects.requireNonNull(subCommand)) {
+                case "ADD" -> addEntity(request, out);
+                case "DELETE" -> deleteEntity(request, out);
+                case "UPDATE" -> updateEntity(request, out);
+                case "GET", "CHECK", "GET_CURRENT" -> getEntity(request, out);
+                case "GET_ALL" -> getAllEntities(out);
+                default -> sendError(out, "Неизвестная команда!");
             }
         } catch (Exception e) {
-            sendError(out, "Произошла ошибка");
+            sendError(out, "Произошла ошибка: " + e.getMessage());
         }
     }
 
     protected void sendError(PrintWriter out, String message) {
-        out.println("ERROR;" + message);
+        try {
+            ResponseDTO errorResponse = new ResponseDTO("ERROR", message, null);
+            out.println(objectMapper.writeValueAsString(errorResponse));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void sendSuccess(PrintWriter out, String status, Map<String, Object> data) {
+        try {
+            ResponseDTO response = new ResponseDTO(status, null, data);
+            out.println(objectMapper.writeValueAsString(response));
+        } catch (Exception e) {
+            sendError(out, "Ошибка при отправке успешного ответа: " + e.getMessage());
+        }
     }
 }

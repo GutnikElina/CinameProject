@@ -2,24 +2,25 @@ package Elements.Form;
 
 import Utils.AppUtils;
 import Utils.FieldValidator;
-import Utils.UIUtils;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import MainApp.MainApp;
+import Models.RequestDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.Map;
 
 public class RegistrationForm {
-    @FXML
-    private TextField usernameField;
-    @FXML
-    private PasswordField passwordField;
-    @FXML
-    private Button registerButton;
-    @FXML
-    private Button backButton;
+    @FXML private TextField usernameField;
+    @FXML private PasswordField passwordField;
+    @FXML private Button registerButton;
+    @FXML private Button backButton;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @FXML
     private void initialize() {
@@ -42,7 +43,17 @@ public class RegistrationForm {
             String username = usernameField.getText();
             String password = passwordField.getText();
 
-            MainApp.getInstance().getServerConnection().sendMessage("REGISTER;" + username + ";" + password);
+            try {
+                RequestDTO request = new RequestDTO();
+                request.setCommand("REGISTER");
+                request.setData(Map.of("username", username, "password", password));
+
+                String jsonRequest = objectMapper.writeValueAsString(request);
+                MainApp.getInstance().getServerConnection().sendMessage(jsonRequest);
+
+            } catch (Exception e) {
+                AppUtils.showAlert("Ошибка", "Не удалось отправить запрос: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
         } else {
             AppUtils.showAlert("Ошибка", "Пожалуйста, проверьте введенные данные.", Alert.AlertType.ERROR);
         }

@@ -11,14 +11,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class AddMovie extends MovieActionBase {
-    @FXML
-    private TextField titleField, genreField, durationField, posterField, trailerField;
-    @FXML
-    private TextArea descriptionField;
-    @FXML
-    private DatePicker releaseDatePicker;
-    @FXML
-    private Button backButton;
+    @FXML private TextField titleField, genreField, durationField;
+    @FXML private TextArea descriptionField;
+    @FXML private DatePicker releaseDatePicker;
+    @FXML private Button backButton;
 
     @FXML
     private void addMovieAction() {
@@ -31,15 +27,11 @@ public class AddMovie extends MovieActionBase {
             UIUtils.showAlert("Ошибка", "Пожалуйста, выберите дату выхода фильма.", Alert.AlertType.ERROR);
             valid = false;
         }
-        valid &= FieldValidator.validateUrlField(posterField, "Введите корректный URL постера.");
-        valid &= FieldValidator.validateUrlField(trailerField, "Введите корректный URL трейлера.");
-
         if (!valid) return;
 
         Movie movie = createMovieFromInput();
         Stage stage = (Stage) titleField.getScene().getWindow();
-
-        sendMovieCommand(movie, stage);
+        sendMovieCommand("MOVIE;ADD;", movie, stage);
     }
 
     @FXML
@@ -59,8 +51,6 @@ public class AddMovie extends MovieActionBase {
             movie.setReleaseDate(releaseDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
         }
 
-        movie.setPoster(posterField.getText());
-        movie.setTrailerUrl(trailerField.getText());
         movie.setDescription(descriptionField.getText());
         return movie;
     }

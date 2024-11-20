@@ -28,8 +28,4 @@ public class Movie {
 
     @Column(nullable = false)
     private String description;    // Описание фильма
-
-    private String poster;         // URL постера фильма
-
-    private String trailerUrl;     // URL трейлера фильма
 }

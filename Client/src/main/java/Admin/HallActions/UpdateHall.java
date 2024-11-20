@@ -35,8 +35,9 @@ public class UpdateHall extends HallActionBase {
 
         Hall hall = new Hall(id, name, capacity);
         Stage stage = (Stage) updateButton.getScene().getWindow();
-        sendHallCommand("UPDATE", hall, stage);
+        sendHallCommand("HALL;UPDATE", hall, stage);
     }
+
     @FXML
     private void handleBackButton() {
         Stage stage = (Stage) backButton.getScene().getWindow();

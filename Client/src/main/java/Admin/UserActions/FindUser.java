@@ -2,9 +2,9 @@ package Admin.UserActions;
 
 import Admin.GeneralActions.UserActionBase;
 import Models.User;
-import Utils.AppUtils;
 import Utils.UIUtils;
 import Utils.FieldValidator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -13,15 +13,15 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 public class FindUser extends UserActionBase {
 
-    @FXML
-    private TextField userIdField;
-    @FXML
-    private Label usernameLabel, roleLabel, createdAtLabel;
-    @FXML
-    private Button backButton;
+    @FXML private TextField userIdField;
+    @FXML private Label usernameLabel, roleLabel, createdAtLabel;
+    @FXML private Button backButton;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @FXML
     private void fetchUserDetails() {
@@ -29,19 +29,39 @@ public class FindUser extends UserActionBase {
             return;
         }
 
-        int userId = Integer.parseInt(userIdField.getText());
-        String response = AppUtils.sendToServer("USER;GET;" + userId);
+        try {
+            int userId = Integer.parseInt(userIdField.getText());
+            Map<String, Object> requestData = Map.of(
+                    "command", "USER;GET;",
+                    "data", Map.of("id", userId)
+            );
 
-        if (response.startsWith("USER_FOUND;")) {
-            String[] userData = response.split(";");
-            User user = new User();
-            user.setId(Integer.parseInt(userData[1]));
-            user.setUsername(userData[2]);
-            user.setRole(userData[3]);
-            user.setCreatedAt(LocalDateTime.parse(userData[4]));
-            updateUserDetails(user);
-        } else {
-            UIUtils.showAlert("Ошибка", "Пользователь не найден.", Alert.AlertType.INFORMATION);
+            String response = sendJsonCommandToServer(requestData);
+
+            if (response.startsWith("{")) {
+                Map<String, Object> userData = objectMapper.readValue(response, Map.class);
+
+                if (userData.containsKey("id") &&
+                        userData.containsKey("username") &&
+                        userData.containsKey("role") &&
+                        userData.containsKey("createdAt")) {
+
+                    User user = new User();
+                    user.setId((Integer) userData.get("id"));
+                    user.setUsername((String) userData.get("username"));
+                    user.setRole((String) userData.get("role"));
+                    user.setCreatedAt(LocalDateTime.parse((String) userData.get("createdAt")));
+
+                    updateUserDetails(user);
+                } else {
+                    UIUtils.showAlert("Ошибка", "Некорректный формат ответа от сервера.", Alert.AlertType.ERROR);
+                }
+            } else {
+                UIUtils.showAlert("Ошибка", "Некорректный ответ от сервера.", Alert.AlertType.ERROR);
+            }
+        } catch (Exception e) {
+            UIUtils.showAlert("Ошибка", "Ошибка при выполнении запроса: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace();
         }
     }
 

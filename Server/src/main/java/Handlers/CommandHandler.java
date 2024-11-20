@@ -1,7 +1,9 @@
 package Handlers;
 
+import Models.RequestDTO;
+
 import java.io.PrintWriter;
 
 public interface CommandHandler {
-    void handle(String[] requestParts, PrintWriter out);
+    void handle(RequestDTO request, PrintWriter out);
 }

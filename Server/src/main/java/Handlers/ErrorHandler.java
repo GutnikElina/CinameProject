@@ -1,14 +1,11 @@
 package Handlers;
 
+import Models.RequestDTO;
 import java.io.PrintWriter;
 
 public class ErrorHandler implements CommandHandler {
     @Override
-    public void handle(String[] requestParts, PrintWriter out) {
-        sendError(out, "Неизвестная команда!");
-    }
-
-    protected void sendError(PrintWriter out, String message) {
-        out.println("ERROR;" + message);
+    public void handle(RequestDTO request, PrintWriter out) {
+        out.println("ERROR;Неизвестная команда!");
     }
 }

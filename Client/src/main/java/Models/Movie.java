@@ -13,8 +13,6 @@ public class Movie {
     private String genre;          // Жанр фильма
     private int duration;          // Продолжительность в минутах
     private String releaseDate;    // Дата выхода
-    private String poster;         // URL постера фильма
-    private String trailerUrl;     // URL трейлера фильма
     private String description;    // Описание фильма
 }
 

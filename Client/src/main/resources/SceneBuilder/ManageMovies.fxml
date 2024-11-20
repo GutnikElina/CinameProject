@@ -9,45 +9,49 @@
             prefHeight="500.0" prefWidth="800.0" style="-fx-background-color: #8d85a6;"
             stylesheets="@/style.css" xmlns="http://javafx.com/javafx/17.0.13"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="Admin.MovieActions.ManageMovies">
-   <children>
-      <AnchorPane layoutX="45.0" layoutY="89.0" prefHeight="365.0" prefWidth="728.0" style="-fx-background-color: #f3f1fb;">
-         <children>
-            <Button fx:id="addFilms" layoutX="189.0" layoutY="40.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="322.0" styleClass="manage" text="Добавить фильм">
-               <font>
-                  <Font name="Tahoma" size="20.0" />
-               </font>
-            </Button>
-            <Button fx:id="deleteFilms" layoutX="189.0" layoutY="88.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="322.0" styleClass="manage" text="Удалить фильм">
-               <font>
-                  <Font name="Tahoma" size="20.0" />
-               </font>
-            </Button>
-            <Button fx:id="findFilms" layoutX="189.0" layoutY="135.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="322.0" styleClass="manage" text="Найти фильм">
-               <font>
-                  <Font name="Tahoma" size="20.0" />
-               </font>
-            </Button>
-            <Button fx:id="getAllFilms" layoutX="189.0" layoutY="183.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="322.0" styleClass="manage" text="Вывести все фильмы">
-               <font>
-                  <Font name="Tahoma" size="20.0" />
-               </font>
-            </Button>
-            <Button fx:id="updateFilms" layoutX="189.0" layoutY="232.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="322.0" styleClass="manage" text="Обновить фильм">
-               <font>
-                  <Font name="Tahoma" size="20.0" />
-               </font>
-            </Button>
-            <Button fx:id="out" layoutX="248.0" layoutY="294.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="204.0" styleClass="button" text="Назад">
-               <font>
-                  <Font name="Tahoma" size="20.0" />
-               </font>
-            </Button>
-         </children>
-      </AnchorPane>
-      <Label alignment="CENTER" layoutX="153.0" layoutY="24.0" prefHeight="65.0" prefWidth="494.0" text="Управление фильмами" textFill="WHITE">
+   <AnchorPane layoutX="45.0" layoutY="89.0" prefHeight="365.0" prefWidth="728.0"
+               style="-fx-background-color: #f3f1fb;">
+      <Button fx:id="addFilms" layoutX="189.0" layoutY="40.0" mnemonicParsing="false" prefHeight="38.0"
+              prefWidth="322.0" styleClass="manage" text="Добавить фильм">
          <font>
-            <Font name="Century Gothic" size="30.0" />
+            <Font name="Tahoma" size="20.0"/>
          </font>
-      </Label>
-   </children>
+      </Button>
+      <Button fx:id="deleteFilms" layoutX="189.0" layoutY="88.0" mnemonicParsing="false" prefHeight="38.0"
+              prefWidth="322.0" styleClass="manage" text="Удалить фильм">
+         <font>
+            <Font name="Tahoma" size="20.0"/>
+         </font>
+      </Button>
+      <Button fx:id="findFilms" layoutX="189.0" layoutY="135.0" mnemonicParsing="false" prefHeight="38.0"
+              prefWidth="322.0" styleClass="manage" text="Найти фильм">
+         <font>
+            <Font name="Tahoma" size="20.0"/>
+         </font>
+      </Button>
+      <Button fx:id="getAllFilms" layoutX="189.0" layoutY="183.0" mnemonicParsing="false" prefHeight="38.0"
+              prefWidth="322.0" styleClass="manage" text="Вывести все фильмы">
+         <font>
+            <Font name="Tahoma" size="20.0"/>
+         </font>
+      </Button>
+      <Button fx:id="updateFilms" layoutX="189.0" layoutY="232.0" mnemonicParsing="false" prefHeight="38.0"
+              prefWidth="322.0" styleClass="manage" text="Обновить фильм">
+         <font>
+            <Font name="Tahoma" size="20.0"/>
+         </font>
+      </Button>
+      <Button fx:id="out" layoutX="248.0" layoutY="294.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="204.0"
+              styleClass="button" text="Назад">
+         <font>
+            <Font name="Tahoma" size="20.0"/>
+         </font>
+      </Button>
+   </AnchorPane>
+   <Label alignment="CENTER" layoutX="153.0" layoutY="24.0" prefHeight="65.0" prefWidth="494.0"
+          text="Управление фильмами" textFill="WHITE">
+      <font>
+         <Font name="Century Gothic" size="30.0"/>
+      </font>
+   </Label>
 </AnchorPane>
