@@ -54,8 +54,7 @@ public class FindTicket {
                     seatNumberLabel.setText(ticketData[3] + " место");
                     userIdLabel.setText(ticketData[4]);
                     priceLabel.setText(ticketData[5] + " рублей");
-                    purchaseTimeLabel.setText(formatDateTime(ticketData[6]));
-                    System.out.println(response);
+                    purchaseTimeLabel.setText(formatDateTime(ticketData[8]));
                 } else if (response.equals("TICKET_NOT_FOUND")) {
                     AppUtils.showAlert("Ошибка", "Билет с указанным ID не найден.", Alert.AlertType.WARNING);
                 } else if (response.startsWith("ERROR;")) {

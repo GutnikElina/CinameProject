@@ -14,4 +14,5 @@ public class User {
     private String password;            // Пароль пользователя
     private String role;                // Роль пользователя
     private LocalDateTime createdAt;    // Дата и время создания пользователя
+    private String token;               // Токен
 }

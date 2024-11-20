@@ -29,4 +29,12 @@ public class FilmSession {
 
     @Column(name = "price", nullable = false)
     private BigDecimal price;               // Цена билета на сеанс
+
+    public FilmSession(int movieId, int hallId, LocalDateTime startTime, LocalDateTime endTime, BigDecimal price) {
+        this.movieId = movieId;
+        this.hallId = hallId;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.price = price;
+    }
 }

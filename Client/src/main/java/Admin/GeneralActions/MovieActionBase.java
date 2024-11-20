@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 public abstract class MovieActionBase {
 
     protected void sendMovieCommand(Movie movie, Stage stage) {
-        String command = String.format("MOVIE;ADD;%s;%s;%d;%s;%s;%s;%s",
+        String command = String.format("MOVIE;ADD;0;%s;%s;%d;%s;%s;%s;%s",
                 movie.getTitle(), movie.getGenre(), movie.getDuration(),
                 movie.getReleaseDate(), movie.getPoster(), movie.getTrailerUrl(), movie.getDescription());
         String response = AppUtils.sendToServer(command);

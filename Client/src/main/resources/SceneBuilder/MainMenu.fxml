@@ -5,10 +5,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="500.0" prefWidth="800.0" style="-fx-background-color: #8d85a6;"
-            xmlns="http://javafx.com/javafx/17.0.13" xmlns:fx="http://javafx.com/fxml/1"
-            stylesheets="@/style.css" fx:controller="Elements.Menu.MainMenuController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" style="-fx-background-color: #8d85a6;" stylesheets="@/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Elements.Menu.MainMenuController">
    <children>
       <AnchorPane layoutX="45.0" layoutY="127.0" prefHeight="327.0" prefWidth="698.0" style="-fx-background-color: #f3f1fb;">
          <children>
@@ -29,9 +26,9 @@
             </Label>
          </children>
       </AnchorPane>
-      <Label layoutX="271.0" layoutY="59.0" prefHeight="65.0" prefWidth="258.0" text="CineRate" textFill="#372a48">
+      <Label layoutX="250.0" layoutY="50.0" prefHeight="77.0" prefWidth="289.0" text="CineRate" textFill="#372a48">
          <font>
-            <Font name="Bauhaus 93" size="59.0" />
+            <Font name="Bauhaus 93" size="67.0" />
          </font>
       </Label>
    </children>

@@ -1,9 +1,6 @@
 package Handlers;
 
 import java.io.PrintWriter;
-import java.util.Arrays;
-
-import Services.AuthService;
 
 public abstract class EntityHandler<T> implements CommandHandler {
     protected abstract void addEntity(String[] requestParts, PrintWriter out);
@@ -11,8 +8,6 @@ public abstract class EntityHandler<T> implements CommandHandler {
     protected abstract void deleteEntity(String[] requestParts, PrintWriter out);
     protected abstract void getEntity(String[] requestParts, PrintWriter out);
     protected abstract void getAllEntities(PrintWriter out);
-
-    AuthService authService = new AuthService();
 
     protected int parseInt(String value, PrintWriter out) {
         try {

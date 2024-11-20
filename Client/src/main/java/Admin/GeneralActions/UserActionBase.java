@@ -39,7 +39,7 @@ public abstract class UserActionBase {
         }
     }
 
-    protected User createUser(String username, String password, String role) {
-        return new User(0, username, password, role, LocalDateTime.now());
+    protected User createUser(String username, String password, String role, String token) {
+        return new User(0, username, password, role, LocalDateTime.now(), token);
     }
 }

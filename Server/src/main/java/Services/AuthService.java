@@ -89,7 +89,7 @@ public class AuthService extends BaseService {
         });
     }
 
-    private String generateToken(String username, String role) {
+    public String generateToken(String username, String role) {
         try {
             String token = Jwts.builder()
                     .setSubject(username)
@@ -98,7 +98,6 @@ public class AuthService extends BaseService {
                     .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 день
                     .signWith(SECRET_KEY)
                     .compact();
-            System.out.println("Generated token: " + token);
             return token;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Ошибка генерации токена для пользователя: " + username, e);

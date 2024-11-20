@@ -1,6 +1,7 @@
 package Admin.UserActions;
 
 import Admin.GeneralActions.UserActionBase;
+import Elements.Menu.UserMenu;
 import Models.User;
 import Utils.FieldValidator;
 import Utils.UIUtils;
@@ -38,7 +39,7 @@ public class AddUser extends UserActionBase {
 
         if (!valid) return;
 
-        User user = createUser(usernameField.getText(), passwordField.getText(), roleComboBox.getValue());
+        User user = createUser(usernameField.getText(), passwordField.getText(), roleComboBox.getValue(), UserMenu.userToken);
         Stage stage = (Stage) usernameField.getScene().getWindow();
         sendUserCommand(user, stage);
     }

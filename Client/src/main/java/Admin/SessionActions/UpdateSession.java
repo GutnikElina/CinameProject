@@ -7,18 +7,24 @@ import Utils.UIUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
 public class UpdateSession{
-
+    @FXML
+    private TextField priceField;
     @FXML
     private TextField idField, startTimeField, endTimeField;
 
     @FXML
     private ComboBox<String> movieComboBox, hallComboBox;
+    @FXML
+    private DatePicker startDatePicker, endDatePicker;
+
 
     private final Map<String, Integer> movieIdMap = new HashMap<>();
     private final Map<String, Integer> hallIdMap = new HashMap<>();
@@ -62,9 +68,13 @@ public class UpdateSession{
 
     @FXML
     private void updateSessionAction() {
-        if (!FieldValidator.validateNumericField(idField, "Введите корректный ID сеанса.") ||
-                !FieldValidator.validateTextField(startTimeField, "Введите корректное время начала (yyyy-MM-dd HH:mm).", 1) ||
-                !FieldValidator.validateTextField(endTimeField, "Введите корректное время окончания (yyyy-MM-dd HH:mm).", 1)) {
+        if (!FieldValidator.validateNumericField(idField, "Введите корректный ID сеанса.")) {
+            return;
+        }
+
+        if (startDatePicker.getValue() == null || endDatePicker.getValue() == null ||
+                startTimeField.getText().trim().isEmpty() || endTimeField.getText().trim().isEmpty()) {
+            UIUtils.showAlert("Ошибка", "Все поля времени и даты должны быть заполнены.", Alert.AlertType.ERROR);
             return;
         }
 
@@ -73,26 +83,58 @@ public class UpdateSession{
             return;
         }
 
-        Session session = new Session();
-        session.setId(Integer.parseInt(idField.getText()));
-        session.setMovieId(movieIdMap.get(movieComboBox.getValue()));
-        session.setHallId(hallIdMap.get(hallComboBox.getValue()));
-        session.setStartTime(LocalDateTime.parse(startTimeField.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-        session.setEndTime(LocalDateTime.parse(endTimeField.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        try {
+            String startDate = startDatePicker.getValue().toString();
+            String endDate = endDatePicker.getValue().toString();
+            String startTime = startTimeField.getText().trim();
+            String endTime = endTimeField.getText().trim();
 
-        String command = String.format("SESSION;UPDATE;%d;%d;%d;%s;%s",
-                session.getId(),
-                session.getMovieId(),
-                session.getHallId(),
-                session.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                session.getEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            if (!startTime.matches("\\d{2}:\\d{2}") || !endTime.matches("\\d{2}:\\d{2}")) {
+                UIUtils.showAlert("Ошибка", "Время должно быть в формате HH:mm", Alert.AlertType.ERROR);
+                return;
+            }
 
-        String response = AppUtils.sendToServer(command);
-        if (response.contains("ERROR")) {
-            UIUtils.showAlert("Ошибка", "Ошибка при обновлении сеанса: " + response, Alert.AlertType.ERROR);
-        } else {
-            UIUtils.showAlert("Успех", "Сеанс успешно обновлен.", Alert.AlertType.INFORMATION);
-            handleBackButton();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime startDateTime = LocalDateTime.parse(startDate + " " + startTime, formatter);
+            LocalDateTime endDateTime = LocalDateTime.parse(endDate + " " + endTime, formatter);
+
+            if (endDateTime.isBefore(startDateTime)) {
+                UIUtils.showAlert("Ошибка", "Время окончания не может быть раньше времени начала.", Alert.AlertType.ERROR);
+                return;
+            }
+
+            priceField.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue.matches("\\d*")) {
+                    priceField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            });
+            String priceText = priceField.getText();
+            if (priceText == null || priceText.isEmpty()) {
+                throw new IllegalArgumentException("Цена должна быть указана!");
+            }
+
+            BigDecimal price = new BigDecimal(priceText);
+            if (price.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException("Цена должна быть больше нуля!");
+            }
+
+            String command = String.format("SESSION;UPDATE;%d;%d;%d;%s;%s;%s",
+                    Integer.parseInt(idField.getText()),
+                    movieIdMap.get(movieComboBox.getValue()),
+                    hallIdMap.get(hallComboBox.getValue()),
+                    startDateTime.format(formatter),
+                    endDateTime.format(formatter),
+                    price.toPlainString());
+
+            String response = AppUtils.sendToServer(command);
+            if (response.contains("ERROR")) {
+                UIUtils.showAlert("Ошибка", "Ошибка при обновлении сеанса: " + response, Alert.AlertType.ERROR);
+            } else {
+                UIUtils.showAlert("Успех", "Сеанс успешно обновлен.", Alert.AlertType.INFORMATION);
+                handleBackButton();
+            }
+        } catch (Exception e) {
+            UIUtils.showAlert("Ошибка", "Ошибка при обновлении сеанса: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 

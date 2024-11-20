@@ -5,7 +5,6 @@ import org.hibernate.query.Query;
 import java.util.List;
 
 public class UserService extends BaseService implements Repository<User> {
-
     @Override
     public void add(User user) {
         executeTransaction(session -> session.save(user));
