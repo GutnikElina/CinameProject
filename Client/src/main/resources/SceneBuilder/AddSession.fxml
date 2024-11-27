@@ -22,17 +22,11 @@
          <Insets left="300.0" top="50.0" />
       </VBox.margin></Label>
     <GridPane hgap="10" vgap="15">
-        <Label alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="281.0" text="Дата начала:" GridPane.columnIndex="0" GridPane.rowIndex="0">
+        <Label alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="281.0" text="Дата сеанса:" GridPane.columnIndex="0" GridPane.rowIndex="0">
          <font>
             <Font name="Segoe UI Semibold" size="14.0" />
          </font></Label>
         <DatePicker fx:id="startDatePicker" prefHeight="35.0" prefWidth="282.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-
-        <Label alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="273.0" text="Дата окончания:" GridPane.columnIndex="0" GridPane.rowIndex="1">
-         <font>
-            <Font name="Segoe UI Semibold" size="14.0" />
-         </font></Label>
-        <DatePicker fx:id="endDatePicker" prefHeight="36.0" prefWidth="282.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
         <Label alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="274.0" text="Время начала:" GridPane.columnIndex="0" GridPane.rowIndex="2">
          <font>

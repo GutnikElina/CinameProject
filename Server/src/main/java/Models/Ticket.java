@@ -13,19 +13,19 @@ import java.time.LocalDateTime;
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;                         // Уникальный идентификатор билета
+    private Integer id;                         // Уникальный идентификатор билета
 
     @Column(name = "session_id", nullable = false)
-    private int sessionId;                  // Идентификатор сеанса, на который приобретён билет
+    private Integer sessionId;                  // Идентификатор сеанса, на который приобретён билет
 
     @Column(name = "user_id", nullable = false)
-    private int userId;                     // Идентификатор пользователя, купившего билет
+    private Integer userId;                     // Идентификатор пользователя, купившего билет
 
     @Column(name = "seat_number", nullable = false)
     private String seatNumber;              // Номер места, которое занимает билет
 
-    @Column(nullable = false)
-    private BigDecimal price;               // Цена билета
+    @Column(name = "price", nullable = false)
+    private BigDecimal price;               // Цена билета на сеанс
 
     @Column(name = "status", nullable = false)
     private String status;                  // Новый статус билета ("PENDING", "CONFIRMED", "CANCELLED", "EXCHANGED")

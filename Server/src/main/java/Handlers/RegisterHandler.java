@@ -1,54 +1,34 @@
 package Handlers;
 
-import Models.RequestDTO;
-import Models.ResponseDTO;
-import Models.User;
 import Services.AuthService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import Models.RequestDTO;
+import Models.User;
+import Utils.ResponseUtil;
+import Utils.GsonFactory;
+import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
+
+import static Utils.ResponseUtil.gson;
 
 @AllArgsConstructor
 public class RegisterHandler implements CommandHandler {
 
     private final AuthService authService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void handle(RequestDTO request, PrintWriter out) {
         try {
-            User user = objectMapper.convertValue(request.getData(), User.class);
+            User user = gson.fromJson(gson.toJson(request.getData()), User.class);
             boolean isRegistered = authService.register(user);
+
             if (isRegistered) {
-                sendSuccess(out);
+                ResponseUtil.sendSuccess(out, "REGISTER_SUCCESS", null);
             } else {
-                sendError(out, "Ошибка регистрации: пользователь уже существует");
+                ResponseUtil.sendError(out, "Пользователь уже существует");
             }
         } catch (Exception e) {
-            sendError(out, "Ошибка при регистрации: " + e.getMessage());
-        }
-    }
-
-    private void sendError(PrintWriter out, String message) {
-        try {
-            ResponseDTO errorResponse = new ResponseDTO("ERROR", message, null);
-            out.println(objectMapper.writeValueAsString(errorResponse));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void sendSuccess(PrintWriter out) {
-        try {
-            Map<String, Object> response = new HashMap<>();
-            response.put("status", "REGISTER_SUCCESS");
-            response.put("message", "Операция выполнена успешно");
-            response.put("data", null);
-            out.println(objectMapper.writeValueAsString(response));
-        } catch (Exception e) {
-            e.printStackTrace();
+            ResponseUtil.sendError(out, "Ошибка при регистрации: " + e.getMessage());
         }
     }
 }

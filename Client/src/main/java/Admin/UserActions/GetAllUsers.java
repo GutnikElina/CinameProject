@@ -1,22 +1,26 @@
 package Admin.UserActions;
 
-import Utils.AppUtils;
+import Utils.GsonFactory;
+import Utils.UIUtils;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GetAllUsers {
+
     @FXML private ListView<String> listView;
     @FXML private Button backButton;
+    private final Gson gson = GsonFactory.create();
 
     @FXML
     private void initialize() {
@@ -29,47 +33,52 @@ public class GetAllUsers {
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-            String command = "USER;GET_ALL;";
-            out.println(command);
+            JsonObject requestData = new JsonObject();
+            requestData.addProperty("command", "USER;GET_ALL;");
+            String jsonRequest = gson.toJson(requestData);
 
-            List<String> users = new ArrayList<>();
-            String response;
-            while ((response = in.readLine()) != null) {
-                if (response.equals("END_OF_USERS")) {
-                    break;
-                }
-                if (isValidResponse(response)) {
-                    users.add(formatUserResponse(response));
-                } else if (response.startsWith("ERROR;")) {
-                    handleError();
-                    break;
-                }
+            out.println(jsonRequest);
+
+            String jsonResponse = in.readLine();
+            if (jsonResponse == null) {
+                throw new RuntimeException("Пустой ответ от сервера");
             }
-            updateListView(users);
+            JsonObject responseMap = gson.fromJson(jsonResponse, JsonObject.class);
 
-        } catch (IOException e) {
-            handleError();
+            if ("SUCCESS".equals(responseMap.get("status").getAsString())) {
+                JsonObject dataObject = responseMap.getAsJsonObject("data");
+
+                JsonArray usersData = dataObject.getAsJsonArray("data");
+
+                updateListView(usersData);
+            } else if ("ERROR".equals(responseMap.get("status").getAsString())) {
+                String errorMessage = responseMap.get("message").getAsString();
+                UIUtils.showAlert("Ошибка", errorMessage, Alert.AlertType.ERROR);
+            } else {
+                UIUtils.showAlert("Ошибка", "Неизвестный ответ от сервера.", Alert.AlertType.ERROR);
+            }
+
+        } catch (JsonSyntaxException e) {
+            UIUtils.showAlert("Ошибка", "Ошибка обработки JSON: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace();
+        } catch (Exception e) {
+            UIUtils.showAlert("Ошибка", "Не удалось получить данные: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace();
         }
     }
 
-    private boolean isValidResponse(String response) {
-        return response.startsWith("USER_FOUND;");
-    }
-
-    private String formatUserResponse(String response) {
-        String[] userData = response.split(";");
-        int userId = Integer.parseInt(userData[1]);
-        String username = userData[2];
-        String role = userData[3];
-        return "ID: " + userId + " - " + username + " (" + role + ")";
-    }
-
-    private void updateListView(List<String> users) {
+    private void updateListView(JsonArray usersData) {
         listView.getItems().clear();
-        if (users.isEmpty()) {
+        if (usersData.size() == 0) {
             listView.getItems().add("Нет доступных пользователей.");
         } else {
-            listView.getItems().addAll(users);
+            for (int i = 0; i < usersData.size(); i++) {
+                JsonObject user = usersData.get(i).getAsJsonObject();
+                int userId = user.get("id").getAsInt();
+                String username = user.get("username").getAsString();
+                String role = user.get("role").getAsString();
+                listView.getItems().add("ID: " + userId + " - " + username + " (" + role + ")");
+            }
         }
     }
 
@@ -77,9 +86,5 @@ public class GetAllUsers {
     private void handleBackButton() {
         Stage stage = (Stage) backButton.getScene().getWindow();
         stage.close();
-    }
-
-    private void handleError() {
-        AppUtils.showAlert("Ошибка", "Не удалось получить данные.", Alert.AlertType.ERROR);
     }
 }

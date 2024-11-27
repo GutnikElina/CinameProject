@@ -35,7 +35,7 @@
         </Label>
         <ComboBox fx:id="hallComboBox" prefHeight="30.0" prefWidth="337.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="232.0" text="Дата начала:" GridPane.columnIndex="0" GridPane.rowIndex="3">
+        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="232.0" text="Дата сеанса:" GridPane.columnIndex="0" GridPane.rowIndex="3">
             <font>
                 <Font name="Segoe UI Semibold" size="14.0" />
             </font>
@@ -48,13 +48,6 @@
             </font>
         </Label>
         <TextField fx:id="startTimeField" prefHeight="37.0" prefWidth="200.0" promptText="Введите время начала (HH:mm)" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-
-        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="230.0" text="Дата окончания:" GridPane.columnIndex="0" GridPane.rowIndex="5">
-            <font>
-                <Font name="Segoe UI Semibold" size="14.0" />
-            </font>
-        </Label>
-        <DatePicker fx:id="endDatePicker" prefHeight="34.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 
         <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="230.0" text="Время окончания:" GridPane.columnIndex="0" GridPane.rowIndex="6">
             <font>
@@ -86,7 +79,7 @@
       </rowConstraints>
     </GridPane>
     <HBox alignment="CENTER" spacing="20">
-        <Button contentDisplay="CENTER" onAction="#updateSessionAction" prefHeight="33.0" prefWidth="174.0" styleClass="enter" text="Обновить сеанс" textAlignment="CENTER">
+        <Button  fx:id="updateButton" contentDisplay="CENTER" onAction="#updateSessionAction" prefHeight="33.0" prefWidth="174.0" styleClass="enter" text="Обновить сеанс" textAlignment="CENTER">
          <HBox.margin>
             <Insets left="20.0" />
          </HBox.margin></Button>

@@ -1,32 +1,31 @@
 package Admin.TicketActions;
 
+import Admin.GeneralActions.TicketActionBase;
+import Models.ResponseDTO;
+import Utils.FieldValidator;
 import Utils.UIUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import Utils.AppUtils;
-import java.math.BigDecimal;
+import Models.Ticket;
+import Models.RequestDTO;
+import com.google.gson.Gson;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
-public class UpdateTicket {
+public class UpdateTicket extends TicketActionBase {
 
-    @FXML
-    private ComboBox<String> sessionComboBox;
-    @FXML
-    private ComboBox<String> userComboBox;
-    @FXML
-    private TextField seatNumberField;
-    @FXML
-    private TextField priceField;
-    @FXML
-    private TextField ticketIdField;
-    @FXML
-    private Button backButton;
-
-    @FXML
-    private ComboBox<String> statusComboBox;
-
-    @FXML
-    private ComboBox<String> requestTypeComboBox;
+    @FXML public Button updateButton;
+    @FXML private ComboBox<String> sessionComboBox;
+    @FXML private ComboBox<String> userComboBox;
+    @FXML private TextField seatNumberField;
+    @FXML private TextField ticketIdField;
+    @FXML private Button backButton;
+    @FXML private ComboBox<String> statusComboBox;
+    @FXML private ComboBox<String> requestTypeComboBox;
+    private final Gson gson = new Gson();
 
     @FXML
     private void initialize() {
@@ -45,71 +44,105 @@ public class UpdateTicket {
     }
 
     private void loadSessionData() {
-        String sessionCommand = "SESSION;GET_ALL";
-        String sessionResponse = AppUtils.sendToServerAndGetFullResponse(sessionCommand);
-        if (sessionResponse.startsWith("SESSION_FOUND")) {
-            String[] sessionLines = sessionResponse.split("\n");
-            for (String line : sessionLines) {
-                if (line.startsWith("SESSION_FOUND")) {
-                    String[] sessionParts = line.split(";");
-                    String sessionDetails = sessionParts[1]; // Пример: сеанс в формате "ID;Фильм;Зал;Время"
-                    sessionComboBox.getItems().add(sessionDetails);
-                }
+        try {
+            RequestDTO requestDTO = new RequestDTO("SESSION;GET_ALL", Map.of());
+            String jsonResponse = AppUtils.sendJsonCommandToServer(gson.toJson(requestDTO));
+
+            ResponseDTO response = gson.fromJson(jsonResponse, ResponseDTO.class);
+
+            if ("SUCCESS".equals(response.getStatus()) && response.getData() != null) {
+                List<Map<String, Object>> sessions = (List<Map<String, Object>>) response.getData().get("data");
+                sessionComboBox.getItems().addAll(
+                        sessions.stream()
+                                .map(session -> String.format("ID:%d | %s",
+                                        ((Number) session.get("id")).intValue(),
+                                        session.get("movieTitle")))
+                                .toList()
+                );
+            } else {
+                handleError(response.getMessage());
             }
-        } else {
-            UIUtils.showAlert("Ошибка", "Не удалось загрузить сеансы: " + sessionResponse, Alert.AlertType.ERROR);
+        } catch (Exception e) {
+            handleError("Не удалось загрузить сеансы: " + e.getMessage());
         }
     }
 
     private void loadUserData() {
-        String userCommand = "USER;GET_ALL";
-        String userResponse = AppUtils.sendToServerAndGetFullResponse(userCommand);
-        if (userResponse.startsWith("USER_FOUND")) {
-            String[] userLines = userResponse.split("\n");
-            for (String line : userLines) {
-                if (line.startsWith("USER_FOUND")) {
-                    String[] userParts = line.split(";");
-                    String userDetails = userParts[1] + " (" + userParts[2] + ")";
-                    userComboBox.getItems().add(userDetails);
-                }
+        try {
+            RequestDTO requestDTO = new RequestDTO("USER;GET_ALL", Map.of());
+            String jsonResponse = AppUtils.sendJsonCommandToServer(gson.toJson(requestDTO));
+
+            ResponseDTO response = gson.fromJson(jsonResponse, ResponseDTO.class);
+
+            if ("SUCCESS".equals(response.getStatus()) && response.getData() != null) {
+                List<Map<String, Object>> data = (List<Map<String, Object>>) response.getData().get("data");
+                userComboBox.getItems().addAll(
+                        data.stream()
+                                .map(user -> String.format("%d - %s",
+                                        ((Number) user.get("id")).intValue(),
+                                        user.get("username")))
+                                .toList()
+                );
+            } else {
+                handleError(response.getMessage());
             }
-        } else {
-            UIUtils.showAlert("Ошибка", "Не удалось загрузить пользователей: " + userResponse, Alert.AlertType.ERROR);
+        } catch (Exception e) {
+            handleError("Не удалось загрузить пользователей: " + e.getMessage());
         }
+    }
+
+    private void handleError(String message) {
+        UIUtils.showAlert("Ошибка", message, Alert.AlertType.ERROR);
     }
 
     @FXML
     private void updateTicketAction() {
+        boolean valid = true;
+        valid &= FieldValidator.validateTextField(ticketIdField, "Введите корректный ID билета.", 1);
+        valid &= FieldValidator.validateComboBox(sessionComboBox, "Выберите сеанс.");
+        valid &= FieldValidator.validateTextField(seatNumberField, "Укажите номер места.", 1);
+        valid &= FieldValidator.validateComboBox(statusComboBox, "Выберите статус.");
+        valid &= FieldValidator.validateComboBox(requestTypeComboBox, "Выберите тип запроса.");
+        valid &= FieldValidator.validateComboBox(userComboBox, "Выберите пользователя.");
+
+        if (!valid) return;
+
         try {
-            String ticketIdStr = ticketIdField.getText();
+            String ticketIdStr = ticketIdField.getText().trim();
             String sessionDetails = sessionComboBox.getValue();
-            String seatNumber = seatNumberField.getText();
-            String priceStr = priceField.getText();
+            String seatNumber = seatNumberField.getText().trim();
             String status = statusComboBox.getValue();
             String requestType = requestTypeComboBox.getValue();
-
-            if (ticketIdStr.isEmpty() || sessionDetails == null || seatNumber.isEmpty() || priceStr.isEmpty()
-                    || status == null || requestType == null) {
-                throw new IllegalArgumentException("Все поля должны быть заполнены!");
-            }
+            String userStr = userComboBox.getValue();
 
             int ticketId = Integer.parseInt(ticketIdStr);
-            int sessionId = Integer.parseInt(sessionDetails.split(";")[0]);
-            BigDecimal price = new BigDecimal(priceStr).setScale(2, BigDecimal.ROUND_HALF_UP);
+            int sessionId = extractSessionId(sessionDetails);
 
-            String updateTicketCommand = String.format("TICKET;UPDATE;ALL;%d;%d;%s;%s;%s;%s",
-                    ticketId, sessionId, seatNumber, price, status, requestType);
+            int userId = Integer.parseInt(userStr.split(" - ")[0]);
 
-            String response = AppUtils.sendToServer(updateTicketCommand);
+            Ticket ticket = new Ticket();
+            ticket.setId(ticketId);
+            ticket.setSessionId(sessionId);
+            ticket.setSeatNumber(seatNumber);
+            ticket.setStatus(status);
+            ticket.setRequestType(requestType);
+            ticket.setUserId(userId);
+            ticket.setPurchaseTime(LocalDateTime.now());
 
-            if (response.startsWith("SUCCESS")) {
-                UIUtils.showAlert("Успех", "Билет обновлен", Alert.AlertType.INFORMATION);
-                handleBackButton();
-            } else {
-                UIUtils.showAlert("Ошибка", "Не удалось обновить билет: " + response, Alert.AlertType.ERROR);
-            }
+            Stage stage = (Stage) updateButton.getScene().getWindow();
+            sendTicketCommand(ticket, stage);
+
         } catch (Exception e) {
             UIUtils.showAlert("Ошибка", "Не удалось обновить билет: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private int extractSessionId(String sessionDetails) {
+        try {
+            String sessionIdStr = sessionDetails.split(" \\| ")[0];
+            return Integer.parseInt(sessionIdStr.replace("ID:", "").trim());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Не удалось извлечь ID сеанса: " + sessionDetails);
         }
     }
 

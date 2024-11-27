@@ -2,14 +2,20 @@ package Handlers;
 
 import Models.RequestDTO;
 import Models.Movie;
+import Models.ResponseDTO;
 import Services.MovieService;
-
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import Utils.ResponseUtil;
+import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static Utils.ResponseUtil.*;
 
 @AllArgsConstructor
 public class MovieHandler extends EntityHandler<Movie> {
@@ -19,7 +25,7 @@ public class MovieHandler extends EntityHandler<Movie> {
     @Override
     protected void addEntity(RequestDTO request, PrintWriter out) {
         try {
-            Movie movie = objectMapper.convertValue(request.getData(), Movie.class);
+            Movie movie = gson.fromJson(gson.toJson(request.getData()), Movie.class);
             movieService.add(movie);
             sendSuccess(out, "MOVIE_ADDED", null);
         } catch (Exception e) {
@@ -30,8 +36,16 @@ public class MovieHandler extends EntityHandler<Movie> {
     @Override
     protected void updateEntity(RequestDTO request, PrintWriter out) {
         try {
-            Movie movie = objectMapper.convertValue(request.getData(), Movie.class);
-            movieService.update(movie);
+            Movie movie = gson.fromJson(gson.toJson(request.getData()), Movie.class);
+            Movie existingMovie = movieService.getById(movie.getId());
+
+            if (existingMovie == null) {
+                sendError(out, "Фильм с таким ID не найден.");
+                return;
+            }
+
+            existingMovie.updateFrom(movie);
+            movieService.update(existingMovie);
             sendSuccess(out, "MOVIE_UPDATED", null);
         } catch (Exception e) {
             sendError(out, "Ошибка при обновлении фильма: " + e.getMessage());
@@ -41,15 +55,9 @@ public class MovieHandler extends EntityHandler<Movie> {
     @Override
     protected void deleteEntity(RequestDTO request, PrintWriter out) {
         try {
-            int movieId = Integer.parseInt(request.getData().get("id"));
+            int movieId = ((Double) request.getData().get("id")).intValue();
             movieService.delete(movieId);
             sendSuccess(out, "MOVIE_DELETED", null);
-        } catch (RuntimeException e) {
-            if ("Movie not found".equals(e.getMessage())) {
-                sendError(out, "MOVIE_NOT_FOUND");
-            } else {
-                sendError(out, "Ошибка при удалении фильма: " + e.getMessage());
-            }
         } catch (Exception e) {
             sendError(out, "Ошибка при удалении фильма: " + e.getMessage());
         }
@@ -58,18 +66,11 @@ public class MovieHandler extends EntityHandler<Movie> {
     @Override
     protected void getEntity(RequestDTO request, PrintWriter out) {
         try {
-            String title = request.getData().get("title");
+            String title = (String) request.getData().get("title");
             Movie movie = movieService.getByTitle(title);
 
             if (movie != null) {
-                Map<String, Object> movieData = new HashMap<>();
-                movieData.put("id", movie.getId());
-                movieData.put("title", movie.getTitle());
-                movieData.put("genre", movie.getGenre());
-                movieData.put("duration", movie.getDuration());
-                movieData.put("releaseDate", movie.getReleaseDate());
-                movieData.put("description", movie.getDescription());
-                sendSuccess(out, "MOVIE_FOUND", movieData);
+                sendSuccess(out, "MOVIE_FOUND", Map.of("movie", movie));
             } else {
                 sendError(out, "Фильм не найден");
             }
@@ -82,24 +83,9 @@ public class MovieHandler extends EntityHandler<Movie> {
     protected void getAllEntities(PrintWriter out) {
         try {
             List<Movie> movies = movieService.getAll();
-            List<Map<String, Object>> moviesData = new ArrayList<>();
-
-            for (Movie movie : movies) {
-                Map<String, Object> movieData = new HashMap<>();
-                movieData.put("id", movie.getId());
-                movieData.put("title", movie.getTitle());
-                movieData.put("genre", movie.getGenre());
-                movieData.put("duration", movie.getDuration());
-                movieData.put("releaseDate", movie.getReleaseDate());
-                movieData.put("description", movie.getDescription());
-                moviesData.add(movieData);
-            }
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("status", "SUCCESS");
-            response.put("movies", moviesData);
-
-            sendSuccess(out, "MOVIES_FOUND", response);
+            sendSuccess(out, "MOVIES_FOUND", Map.of(
+                    "movies", movies.stream().map(Movie::toMap).collect(Collectors.toList())
+            ));
         } catch (Exception e) {
             sendError(out, "Ошибка при получении списка фильмов: " + e.getMessage());
         }

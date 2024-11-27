@@ -4,6 +4,7 @@ import Models.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.query.Query;
 import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
@@ -12,10 +13,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Slf4j
 public class AuthService extends BaseService {
 
     private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private static final Logger logger = Logger.getLogger(AuthService.class.getName());
 
     public boolean register(User user) {
         return executeTransactionWithResult(session -> {
@@ -26,7 +27,7 @@ public class AuthService extends BaseService {
                 System.out.println(existingUser);
 
                 if (existingUser != null) {
-                    logger.warning("Пользователь уже существует: " + user.getUsername());
+                    log.warn("Пользователь уже существует: {}", user.getUsername());
                     return Boolean.FALSE;
                 }
 
@@ -39,7 +40,7 @@ public class AuthService extends BaseService {
                 return Boolean.TRUE;
 
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Ошибка при регистрации пользователя: " + user.getUsername(), e);
+                log.error("Ошибка при регистрации пользователя: {}", user.getUsername(), e);
                 return Boolean.FALSE;
             }
         });
@@ -63,11 +64,11 @@ public class AuthService extends BaseService {
                     session.update(user);
                     return new String[]{token, role};
                 } else {
-                    logger.warning("Неверный логин или пароль для пользователя: " + username);
+                    log.warn("Неверный логин или пароль для пользователя: {}", username);
                     return null;
                 }
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Ошибка при входе пользователя: " + username, e);
+                log.error("Ошибка при входе пользователя: {}", username, e);
                 throw e;
             }
         });
@@ -88,7 +89,7 @@ public class AuthService extends BaseService {
                 query.setParameter("username", username);
                 return query.uniqueResult();
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Ошибка получения текущего пользователя: " + e.getMessage(), e);
+                log.error("Ошибка получения текущего пользователя: {}", e.getMessage(), e);
                 return null;
             }
         });
@@ -96,34 +97,16 @@ public class AuthService extends BaseService {
 
     public String generateToken(String username, String role) {
         try {
-            String token = Jwts.builder()
+            return Jwts.builder()
                     .setSubject(username)
                     .claim("role", role)
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + 86400000))
                     .signWith(SECRET_KEY)
                     .compact();
-            return token;
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Ошибка генерации токена для пользователя: " + username, e);
+            log.error("Ошибка генерации токена для пользователя: {}", username, e);
             throw e;
-        }
-    }
-
-    public boolean hasPermission(String token, String requiredRole) {
-        System.out.println("Token for validation: " + token);
-        try {
-            var claims = Jwts.parserBuilder()
-                    .setSigningKey(SECRET_KEY)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-
-            String role = claims.get("role", String.class);
-            return role != null && (role.equals(requiredRole) || role.equals("admin"));
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Ошибка проверки токена: " + e.getMessage(), e);
-            return false;
         }
     }
 }

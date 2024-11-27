@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Movie {
-    private int id;                // Идентификатор фильма
+    private Integer id;            // Идентификатор фильма
     private String title;          // Название фильма
     private String genre;          // Жанр фильма
-    private int duration;          // Продолжительность в минутах
+    private Integer duration;      // Продолжительность в минутах
     private String releaseDate;    // Дата выхода
     private String description;    // Описание фильма
 }

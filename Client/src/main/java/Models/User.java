@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    private int id;                     // Уникальный идентификатор пользователя
+    private Integer id;                 // Уникальный идентификатор пользователя
     private String username;            // Логин пользователя
     private String password;            // Пароль пользователя
     private String role;                // Роль пользователя

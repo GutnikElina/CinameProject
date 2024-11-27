@@ -2,26 +2,31 @@ package Admin.MovieActions;
 
 import Models.Movie;
 import Utils.AppUtils;
+import Utils.GsonFactory;
 import Utils.UIUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import Models.RequestDTO;
 import Models.ResponseDTO;
+
+import java.lang.reflect.Type;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
 
 public class FindMovie {
+
     @FXML private TextField movieTitleField;
     @FXML private Label titleLabel, genreLabel, durationLabel, releaseDateLabel;
     @FXML private TextArea descriptionArea;
     @FXML private Button backButton;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Gson gson = GsonFactory.create();
 
     @FXML
     private void initialize() {
@@ -42,7 +47,6 @@ public class FindMovie {
             UIUtils.showAlert("Ошибка", "Название фильма не может быть пустым.", Alert.AlertType.WARNING);
             return;
         }
-
         sendMovieFindRequest(movieTitle);
     }
 
@@ -52,17 +56,14 @@ public class FindMovie {
             request.setCommand("MOVIE;GET");
             request.setData(Map.of("title", movieTitle));
 
-            String jsonRequest = objectMapper.writeValueAsString(request);
-
-            String response = AppUtils.sendToServer(jsonRequest);
+            String jsonRequest = gson.toJson(request);
+            String response = AppUtils.sendJsonCommandToServer(jsonRequest);
 
             if (response == null) {
                 UIUtils.showAlert("Ошибка", "Не удалось подключиться к серверу.", Alert.AlertType.ERROR);
                 return;
             }
-
             handleMovieResponse(response);
-
         } catch (Exception e) {
             UIUtils.showAlert("Ошибка", "Произошла ошибка при отправке запроса.", Alert.AlertType.ERROR);
         }
@@ -70,25 +71,36 @@ public class FindMovie {
 
     private void handleMovieResponse(String response) {
         try {
-            ResponseDTO responseDTO = objectMapper.readValue(response, ResponseDTO.class);
-            System.out.println(responseDTO);
-
+            ResponseDTO responseDTO = gson.fromJson(response, ResponseDTO.class);
             if ("MOVIE_FOUND".equals(responseDTO.getStatus())) {
-                Map<String, Object> movieData = responseDTO.getData();
+                Type movieDataType = new TypeToken<Map<String, Object>>() {}.getType();
+                Map<String, Object> responseData = gson.fromJson(gson.toJson(responseDTO.getData()), movieDataType);
+
+                // Извлекаем объект "movie" из ответа
+                Map<String, Object> movieData = (Map<String, Object>) responseData.get("movie");
+
+                if (movieData == null) {
+                    UIUtils.showAlert("Ошибка", "Данные фильма отсутствуют.", Alert.AlertType.ERROR);
+                    return;
+                }
+
                 Movie movie = new Movie();
-                movie.setId((Integer) movieData.get("id"));
+
+                movie.setId((movieData.get("id") instanceof Double)
+                        ? ((Double) movieData.get("id")).intValue()
+                        : (Integer) movieData.get("id"));
                 movie.setTitle((String) movieData.get("title"));
                 movie.setGenre((String) movieData.get("genre"));
-                movie.setDuration((Integer) movieData.get("duration"));
+                movie.setDuration((movieData.get("duration") instanceof Double)
+                        ? ((Double) movieData.get("duration")).intValue()
+                        : (Integer) movieData.get("duration"));
+                String releaseDate = (String) movieData.get("releaseDate");
 
-                long releaseDateTimestamp = (Long) movieData.get("releaseDate");
-                String releaseDate = Instant.ofEpochMilli(releaseDateTimestamp)
-                        .atZone(ZoneId.systemDefault())
-                        .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.forLanguageTag("ru"))); // формат с месяцем на русском
-                movie.setReleaseDate(releaseDate);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate date = LocalDate.parse(releaseDate, formatter);
+                movie.setReleaseDate(date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.forLanguageTag("ru"))));
 
                 movie.setDescription((String) movieData.get("description"));
-
                 updateMovieDetails(movie);
             } else {
                 UIUtils.showAlert("Ошибка", responseDTO.getMessage(), Alert.AlertType.INFORMATION);

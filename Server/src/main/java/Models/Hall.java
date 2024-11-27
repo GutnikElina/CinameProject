@@ -13,11 +13,11 @@ import javax.persistence.*;
 public class Hall {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;          // Идентификатор зала
+    private Integer id;          // Идентификатор зала
 
     @Column(nullable = false)
     private String name;     // Название зала
 
     @Column(nullable = false)
-    private int capacity;    // Вместимость зала
+    private Integer capacity;    // Вместимость зала
 }

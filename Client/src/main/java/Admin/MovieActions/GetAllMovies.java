@@ -3,27 +3,33 @@ package Admin.MovieActions;
 import Models.RequestDTO;
 import Models.ResponseDTO;
 import Utils.AppUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import Utils.GsonFactory;
+import Utils.UIUtils;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class GetAllMovies {
+
     @FXML private ListView<String> listView;
     @FXML private Button backButton;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Gson gson = GsonFactory.create();
 
     @FXML
     private void initialize() {
@@ -40,29 +46,30 @@ public class GetAllMovies {
             request.setCommand("MOVIE;GET_ALL");
             request.setData(Map.of());
 
-            String jsonRequest = objectMapper.writeValueAsString(request);
+            String jsonRequest = gson.toJson(request);
             out.println(jsonRequest);
 
             String response = in.readLine();
             if (response != null) {
-                ResponseDTO responseDTO = objectMapper.readValue(response, ResponseDTO.class);
-
+                ResponseDTO responseDTO = gson.fromJson(response, ResponseDTO.class);
                 if ("MOVIES_FOUND".equals(responseDTO.getStatus())) {
+                    Type moviesListType = new TypeToken<List<Map<String, Object>>>() {}.getType();
+                    List<Map<String, Object>> moviesData = gson.fromJson(gson.toJson(responseDTO.getData().get("movies")), moviesListType);
+
                     List<String> movies = new ArrayList<>();
-                    List<Map<String, Object>> moviesData = (List<Map<String, Object>>) responseDTO.getData().get("movies");
                     for (Map<String, Object> movieData : moviesData) {
-                        int movieId = (Integer) movieData.get("id");
+                        int movieId = ((Double) movieData.get("id")).intValue();
                         String movieTitle = (String) movieData.get("title");
                         String genre = (String) movieData.get("genre");
-                        int duration = (Integer) movieData.get("duration");
+                        int duration = ((Double) movieData.get("duration")).intValue();
                         movies.add("ID: " + movieId + " - " + movieTitle + " (Жанр: " + genre + ", Длительность: " + duration + " мин.)");
                     }
+
                     updateListView(movies);
                 } else {
                     handleError(responseDTO.getMessage());
                 }
             }
-
         } catch (IOException e) {
             handleError("Не удалось получить данные.");
             e.printStackTrace();
@@ -85,6 +92,6 @@ public class GetAllMovies {
     }
 
     private void handleError(String message) {
-        AppUtils.showAlert("Ошибка", message, Alert.AlertType.ERROR);
+        UIUtils.showAlert("Ошибка", message, Alert.AlertType.ERROR);
     }
 }

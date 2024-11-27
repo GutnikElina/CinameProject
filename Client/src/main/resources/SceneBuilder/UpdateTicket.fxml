@@ -52,13 +52,6 @@
         </Label>
         <TextField fx:id="seatNumberField" prefHeight="34.0" prefWidth="200.0" promptText="Введите номер места" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="232.0" text="Цена:" GridPane.columnIndex="0" GridPane.rowIndex="4">
-            <font>
-                <Font name="Segoe UI Semibold" size="14.0" />
-            </font>
-        </Label>
-        <TextField fx:id="priceField" prefHeight="34.0" prefWidth="200.0" promptText="Введите цену билета" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-
         <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="231.0" text="Статус:" GridPane.columnIndex="0" GridPane.rowIndex="5">
             <font>
                 <Font name="Segoe UI Semibold" size="14.0" />
@@ -86,7 +79,7 @@
     </GridPane>
 
     <HBox alignment="CENTER" spacing="20">
-        <Button contentDisplay="CENTER" onAction="#updateTicketAction" prefHeight="33.0" prefWidth="161.0" styleClass="enter" text="Обновить билет" textAlignment="CENTER">
+        <Button fx:id="updateButton" contentDisplay="CENTER" onAction="#updateTicketAction" prefHeight="33.0" prefWidth="161.0" styleClass="enter" text="Обновить билет" textAlignment="CENTER">
          <HBox.margin>
             <Insets left="20.0" />
          </HBox.margin>

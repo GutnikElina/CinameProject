@@ -62,7 +62,7 @@
                     <Font name="Segoe UI Semibold" size="16.0" />
                 </font></Label>
             <Label fx:id="roleLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <Label text="Дата создания:" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <Label text="Дата регистрации:" GridPane.columnIndex="0" GridPane.rowIndex="2">
                 <font>
                     <Font name="Segoe UI Semibold" size="16.0" />
                 </font></Label>

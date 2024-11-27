@@ -1,6 +1,6 @@
 package Admin.GeneralActions;
 
-import Models.Movie;
+import Models.Ticket;
 import Models.RequestDTO;
 import Models.ResponseDTO;
 import Utils.AppUtils;
@@ -11,20 +11,22 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import java.util.Map;
 
-public abstract class MovieActionBase {
+public abstract class TicketActionBase {
 
     private final Gson gson = GsonFactory.create();
 
-    protected void sendMovieCommand(String action, Movie movie, Stage stage) {
+    protected void sendTicketCommand(Ticket ticket, Stage stage) {
         try {
             RequestDTO requestDTO = new RequestDTO();
-            requestDTO.setCommand(action);
+            requestDTO.setCommand("TICKET;UPDATE");
             requestDTO.setData(Map.of(
-                    "title", movie.getTitle(),
-                    "genre", movie.getGenre(),
-                    "duration", String.valueOf(movie.getDuration()),
-                    "releaseDate", movie.getReleaseDate(),
-                    "description", movie.getDescription()
+                    "id", String.valueOf(ticket.getId()),
+                    "sessionId", String.valueOf(ticket.getSessionId()),
+                    "userId", String.valueOf(ticket.getUserId()),
+                    "seatNumber", ticket.getSeatNumber(),
+                    "status", ticket.getStatus(),
+                    "requestType", ticket.getRequestType(),
+                    "purchaseTime", ticket.getPurchaseTime().toString()
             ));
             String requestJson = gson.toJson(requestDTO);
             String responseJson = AppUtils.sendJsonCommandToServer(requestJson);

@@ -3,24 +3,23 @@ package MainServer;
 import Handlers.CommandFactory;
 import Handlers.CommandHandler;
 import Models.RequestDTO;
-import Models.ResponseDTO;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import Utils.ResponseUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import lombok.extern.slf4j.Slf4j;
 import java.io.*;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+@Slf4j
 public class ClientHandler implements Runnable {
-    private static final Logger logger = Logger.getLogger(ClientHandler.class.getName());
     private final Socket clientSocket;
     private final CommandFactory commandFactory;
-    private final ObjectMapper objectMapper;
+    private final Gson gson;
 
     public ClientHandler(Socket clientSocket, CommandFactory commandFactory) {
         this.clientSocket = clientSocket;
         this.commandFactory = commandFactory;
-        this.objectMapper = new ObjectMapper();
+        this.gson = new Gson();
     }
 
     @Override
@@ -28,13 +27,13 @@ public class ClientHandler implements Runnable {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
              PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
 
-            logger.info("Клиент подключен: " + clientSocket.getRemoteSocketAddress());
+            log.info("Клиент подключен: {}", clientSocket.getRemoteSocketAddress());
             String input;
             while ((input = in.readLine()) != null) {
                 handleClientRequest(input, out);
             }
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Ошибка обработки клиентского запроса: ", e);
+            log.error("Ошибка обработки клиентского запроса: ", e);
         } finally {
             closeSocket();
         }
@@ -42,29 +41,22 @@ public class ClientHandler implements Runnable {
 
     private void handleClientRequest(String input, PrintWriter out) {
         try {
-            RequestDTO request = objectMapper.readValue(input, RequestDTO.class);
+            RequestDTO request = gson.fromJson(input, RequestDTO.class);
             CommandHandler handler = commandFactory.getHandler(request.getCommand());
             handler.handle(request, out);
+        } catch (JsonSyntaxException e) {
+            ResponseUtil.sendError(out, "Некорректный формат JSON: " + e.getMessage());
         } catch (Exception e) {
-            sendError(out, "Некорректный запрос: " + e.getMessage());
-        }
-    }
-
-    private void sendError(PrintWriter out, String message) {
-        try {
-            ResponseDTO errorResponse = new ResponseDTO("ERROR", message, null);
-            out.println(objectMapper.writeValueAsString(errorResponse));
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Ошибка отправки сообщения об ошибке", e);
+            ResponseUtil.sendError(out, "Ошибка обработки запроса: " + e.getMessage());
         }
     }
 
     private void closeSocket() {
         try {
             clientSocket.close();
-            logger.info("Клиент отключен: " + clientSocket.getRemoteSocketAddress());
+            log.info("Клиент отключен: {}", clientSocket.getRemoteSocketAddress());
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Ошибка при закрытии сокета: ", e);
+            log.error("Ошибка при закрытии сокета: ", e);
         }
     }
 }

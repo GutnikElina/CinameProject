@@ -58,18 +58,24 @@
                 </font>
             </Label>
             <Label fx:id="hallLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <Label text="Начало:" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <Label text="Цена:" GridPane.columnIndex="0" GridPane.rowIndex="2">
                 <font>
                     <Font name="Segoe UI Semibold" size="15.0" />
                 </font>
             </Label>
-            <Label fx:id="startTimeLabel" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <Label text="Конец:" GridPane.columnIndex="0" GridPane.rowIndex="3">
+            <Label fx:id="priceLabel" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label text="Начало:" GridPane.columnIndex="0" GridPane.rowIndex="3">
                 <font>
                     <Font name="Segoe UI Semibold" size="15.0" />
                 </font>
             </Label>
-            <Label fx:id="endTimeLabel" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label fx:id="startTimeLabel" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label text="Конец:" GridPane.columnIndex="0" GridPane.rowIndex="4">
+                <font>
+                    <Font name="Segoe UI Semibold" size="15.0" />
+                </font>
+            </Label>
+            <Label fx:id="endTimeLabel" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <columnConstraints>
                 <ColumnConstraints maxWidth="134.5" minWidth="34.0" prefWidth="132.5" />
                 <ColumnConstraints maxWidth="388.0" minWidth="287.5" prefWidth="289.5" />

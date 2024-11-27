@@ -1,9 +1,9 @@
 package Utils;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -68,7 +68,7 @@ public class FieldValidator {
     }
 
     // Валидация даты (например, yyyy-MM-dd)
-    public static boolean validateDate(DatePicker datePicker, String errorMessage) {
+    public static boolean validateDatePicker(DatePicker datePicker, String errorMessage) {
         LocalDate date = datePicker.getValue();
         if (date == null) {
             datePicker.setStyle("-fx-border-color: #ff4444; -fx-border-width: 2;");
@@ -93,4 +93,18 @@ public class FieldValidator {
             return false;
         }
     }
+
+    // Валидация ComboBox (проверка, что выбран элемент)
+    public static <T> boolean validateComboBox(ComboBox<T> comboBox, String errorMessage) {
+        T selectedValue = comboBox.getValue();
+        if (selectedValue == null) {
+            comboBox.setStyle("-fx-border-color: #ff4444; -fx-border-width: 2;");
+            UIUtils.showAlert("Ошибка", errorMessage, Alert.AlertType.ERROR);
+            return false;
+        } else {
+            comboBox.setStyle("");
+            return true;
+        }
+    }
+
 }

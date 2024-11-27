@@ -5,16 +5,15 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import Models.ResponseDTO;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 
 public class ResponseProcessor {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
+    private final Gson gson = new Gson();
     public void handleResponse(String response) {
         if (response == null) return;
         try {
-            ResponseDTO responseDTO = objectMapper.readValue(response, ResponseDTO.class);
+            ResponseDTO responseDTO = gson.fromJson(response, ResponseDTO.class);
 
             Platform.runLater(() -> {
                 switch (responseDTO.getStatus()) {
@@ -22,21 +21,21 @@ public class ResponseProcessor {
                         handleLoginSuccess(responseDTO);
                         break;
                     case "LOGIN_FAILED":
-                        AppUtils.showAlert("Ошибка", "Неправильный логин или пароль.", Alert.AlertType.ERROR);
+                        UIUtils.showAlert("Ошибка", "Неправильный логин или пароль.", Alert.AlertType.ERROR);
                         break;
                     case "REGISTER_SUCCESS":
-                        AppUtils.showAlert("Успешно", "Регистрация прошла успешно!", Alert.AlertType.INFORMATION);
+                        UIUtils.showAlert("Успешно", "Регистрация прошла успешно!", Alert.AlertType.INFORMATION);
                         MainMenu.show(new Stage());
                         break;
                     case "ERROR":
-                        AppUtils.showAlert("Ошибка", responseDTO.getMessage() != null ? responseDTO.getMessage() : "Неизвестная ошибка", Alert.AlertType.ERROR);
+                        UIUtils.showAlert("Ошибка", responseDTO.getMessage() != null ? responseDTO.getMessage() : "Неизвестная ошибка", Alert.AlertType.ERROR);
                         break;
                     default:
-                        AppUtils.showAlert("Ошибка", "Неизвестный ответ от сервера: " + response, Alert.AlertType.ERROR);
+                        UIUtils.showAlert("Ошибка", "Неизвестный ответ от сервера: " + response, Alert.AlertType.ERROR);
                 }
             });
         } catch (Exception e) {
-            AppUtils.showAlert("Ошибка", "Не удалось обработать ответ от сервера: " + e.getMessage(), Alert.AlertType.ERROR);
+            UIUtils.showAlert("Ошибка", "Не удалось обработать ответ от сервера: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -55,7 +54,7 @@ public class ResponseProcessor {
                 EmployeeMenu.show(token);
                 break;
             default:
-                AppUtils.showAlert("Ошибка", "Неизвестная роль", Alert.AlertType.ERROR);
+                UIUtils.showAlert("Ошибка", "Неизвестная роль", Alert.AlertType.ERROR);
         }
     }
 }

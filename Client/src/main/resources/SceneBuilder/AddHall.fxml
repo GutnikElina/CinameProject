@@ -39,7 +39,7 @@
                 <Font name="Segoe UI Semibold" size="14.0" />
             </font>
         </Button>
-        <Button fx:id="backButton" onAction="#handleBackButton" prefHeight="35.0" prefWidth="243.0" styleClass="button" text="Назад" textFill="WHITE">
+        <Button onAction="#handleBackButton" prefHeight="35.0" prefWidth="243.0" styleClass="button" text="Назад" textFill="WHITE">
             <font>
                 <Font size="14.0" />
             </font>

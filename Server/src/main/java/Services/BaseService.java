@@ -1,12 +1,14 @@
 package Services;
 
 import Database.HibernateUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.SessionFactory;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+@Slf4j
 public abstract class BaseService {
 
     protected static final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
@@ -22,7 +24,7 @@ public abstract class BaseService {
             if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }
-            System.err.println("Ошибка транзакции: " + e.getMessage());
+            log.error("Ошибка транзакции: {}", e.getMessage());
             e.printStackTrace();
         }
     }
@@ -39,7 +41,7 @@ public abstract class BaseService {
             if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }
-            System.err.println("Ошибка транзакции: " + e.getMessage());
+            log.error("Ошибка транзакции: {}", e.getMessage());
             e.printStackTrace();
         }
         return result;

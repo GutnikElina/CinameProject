@@ -1,12 +1,17 @@
 package Handlers;
 
 import Models.Hall;
-import Services.HallService;
 import Models.RequestDTO;
+import Services.HallService;
+import Utils.GsonFactory;
 import lombok.AllArgsConstructor;
+
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.PrintWriter;
-import java.util.List;
 import java.util.Map;
+
+import static Utils.ResponseUtil.sendError;
+import static Utils.ResponseUtil.sendSuccess;
 
 @AllArgsConstructor
 public class HallHandler extends EntityHandler<Hall> {
@@ -16,7 +21,7 @@ public class HallHandler extends EntityHandler<Hall> {
     @Override
     protected void addEntity(RequestDTO request, PrintWriter out) {
         try {
-            Hall hall = objectMapper.convertValue(request.getData(), Hall.class);
+            Hall hall = parseRequestData(request, Hall.class);
             hallService.add(hall);
             sendSuccess(out, "HALL_ADDED", null);
         } catch (Exception e) {
@@ -27,7 +32,7 @@ public class HallHandler extends EntityHandler<Hall> {
     @Override
     protected void updateEntity(RequestDTO request, PrintWriter out) {
         try {
-            Hall hall = objectMapper.convertValue(request.getData(), Hall.class);
+            Hall hall = parseRequestData(request, Hall.class);
             hallService.update(hall);
             sendSuccess(out, "HALL_UPDATED", null);
         } catch (Exception e) {
@@ -35,16 +40,12 @@ public class HallHandler extends EntityHandler<Hall> {
         }
     }
 
-
     @Override
     protected void deleteEntity(RequestDTO request, PrintWriter out) {
         try {
-            String hallIdStr = request.getData().get("id");
-            int hallId = Integer.parseInt(hallIdStr);
+            int hallId = Integer.parseInt(request.getData().get("id").toString());
             hallService.delete(hallId);
             sendSuccess(out, "HALL_DELETED", null);
-        } catch (NumberFormatException e) {
-            sendError(out, "Некорректный ID: " + e.getMessage());
         } catch (Exception e) {
             sendError(out, "Ошибка при удалении зала: " + e.getMessage());
         }
@@ -53,16 +54,10 @@ public class HallHandler extends EntityHandler<Hall> {
     @Override
     protected void getEntity(RequestDTO request, PrintWriter out) {
         try {
-            String hallIdStr = request.getData().get("id");
-            System.out.println("Запрос на поиск зала с ID: " + hallIdStr);
-            int hallId = Integer.parseInt(hallIdStr);
+            int hallId = Integer.parseInt(request.getData().get("id").toString());
             Hall hall = hallService.getById(hallId);
             if (hall != null) {
-                sendSuccess(out, "HALL_FOUND", Map.of(
-                        "id", hall.getId(),
-                        "name", hall.getName(),
-                        "capacity", hall.getCapacity()
-                ));
+                sendSuccess(out, "HALL_FOUND", Map.of("hall", hall));
             } else {
                 sendError(out, "Зал с таким ID не найден");
             }
@@ -74,14 +69,13 @@ public class HallHandler extends EntityHandler<Hall> {
     @Override
     protected void getAllEntities(PrintWriter out) {
         try {
-            List<Hall> halls = hallService.getAll();
-            if (halls.isEmpty()) {
-                sendError(out, "Залы не найдены");
-            } else {
-                sendSuccess(out, "HALLS_FOUND", Map.of("halls", halls));
-            }
+            sendSuccess(out, "HALLS_FOUND", Map.of("halls", hallService.getAll()));
         } catch (Exception e) {
             sendError(out, "Ошибка при получении списка залов: " + e.getMessage());
         }
+    }
+
+    private <T> T parseRequestData(RequestDTO request, Class<T> clazz) {
+        return GsonFactory.create().fromJson(GsonFactory.create().toJson(request.getData()), clazz);
     }
 }

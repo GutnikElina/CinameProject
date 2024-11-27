@@ -15,7 +15,6 @@ public class Ticket {
     private Integer sessionId;              // Идентификатор сеанса, на который приобретён билет
     private Integer userId;                 // Идентификатор пользователя, купившего билет
     private String seatNumber;              // Номер места, которое занимает билет
-    private BigDecimal price;               // Цена билета
     private String status;                  // Новый статус билета ("PENDING", "CONFIRMED", "CANCELLED", "EXCHANGED")
     private String requestType;             // Тип запроса ("PURCHASE", "CANCEL", "EXCHANGE")
     private LocalDateTime purchaseTime;     // Дата и время покупки билета

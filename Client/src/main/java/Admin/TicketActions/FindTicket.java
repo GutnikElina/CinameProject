@@ -1,79 +1,76 @@
 package Admin.TicketActions;
 
 import Utils.AppUtils;
-import javafx.application.Application;
+import Utils.UIUtils;
+import Models.RequestDTO;
+import Models.ResponseDTO;
+import com.google.gson.Gson;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 public class FindTicket {
-    @FXML
-    private TextField idField;
-    @FXML
-    private Label sessionIdLabel, seatNumberLabel, userIdLabel, priceLabel, purchaseTimeLabel;
-    @FXML
-    public Button backButton;
+
+    @FXML private TextField idField;
+    @FXML private Label sessionIdLabel, seatNumberLabel, userIdLabel, priceLabel, purchaseTimeLabel;
+    @FXML public Button backButton;
+    private final Gson gson = new Gson();
 
     @FXML
     private void searchTicketById() {
         String idText = idField.getText().trim();
         if (idText.isEmpty()) {
-            AppUtils.showAlert("Ошибка", "Поле ID не может быть пустым.", Alert.AlertType.WARNING);
+            UIUtils.showAlert("Ошибка", "Поле ID не может быть пустым.", Alert.AlertType.WARNING);
             return;
         }
 
         try {
             int ticketId = Integer.parseInt(idText);
-            String message = "TICKET;GET;" + ticketId;
 
-            try (Socket socket = new Socket("localhost", 12345);
-                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-
-                out.println(message);
-
-                String response = in.readLine();
-                if (response == null) {
-                    AppUtils.showAlert("Ошибка", "Ответ сервера отсутствует.", Alert.AlertType.ERROR);
-                    return;
-                }
-                if (response.startsWith("TICKET_FOUND;")) {
-                    String[] ticketData = response.split(";");
-                    sessionIdLabel.setText(ticketData[2]);
-                    seatNumberLabel.setText(ticketData[3] + " место");
-                    userIdLabel.setText(ticketData[4]);
-                    priceLabel.setText(ticketData[5] + " рублей");
-                    purchaseTimeLabel.setText(formatDateTime(ticketData[8]));
-                } else if (response.equals("TICKET_NOT_FOUND")) {
-                    AppUtils.showAlert("Ошибка", "Билет с указанным ID не найден.", Alert.AlertType.WARNING);
-                } else if (response.startsWith("ERROR;")) {
-                    AppUtils.showAlert("Ошибка", response.split(";", 2)[1], Alert.AlertType.ERROR);
-                }
+            RequestDTO requestDTO = new RequestDTO();
+            requestDTO.setCommand("TICKET;GET");
+            requestDTO.setData(Map.of("ticketId", String.valueOf(ticketId)));
+            String requestJson = gson.toJson(requestDTO);
+            String responseJson = AppUtils.sendJsonCommandToServer(requestJson);
+            ResponseDTO response = gson.fromJson(responseJson, ResponseDTO.class);
+            if ("SUCCESS".equals(response.getStatus())) {
+                Map<String, Object> ticketData = (Map<String, Object>) response.getData().get("ticket");
+                sessionIdLabel.setText(String.valueOf(ticketData.get("sessionId")));
+                seatNumberLabel.setText(ticketData.get("seatNumber") + " место");
+                userIdLabel.setText(String.valueOf(ticketData.get("userId")));
+                priceLabel.setText(ticketData.get("price") + " рублей");
+                purchaseTimeLabel.setText(formatDateTime(String.valueOf(ticketData.get("purchaseTime"))));
+            } else if ("TICKET_NOT_FOUND".equals(response.getStatus())) {
+                UIUtils.showAlert("Ошибка", "Билет с указанным ID не найден.", Alert.AlertType.WARNING);
+            } else if ("ERROR".equals(response.getStatus())) {
+                UIUtils.showAlert("Ошибка", response.getMessage(), Alert.AlertType.ERROR);
             }
+
         } catch (NumberFormatException e) {
-            AppUtils.showAlert("Ошибка", "ID должен быть числом.", Alert.AlertType.WARNING);
-        } catch (IOException e) {
-            AppUtils.showAlert("Ошибка", "Не удалось подключиться к серверу.", Alert.AlertType.ERROR);
+            UIUtils.showAlert("Ошибка", "ID должен быть числом.", Alert.AlertType.WARNING);
+            e.printStackTrace();
+        } catch (ClassCastException e) {
+            UIUtils.showAlert("Ошибка", "Некорректный формат данных билета.", Alert.AlertType.ERROR);
+            e.printStackTrace();
+        } catch (Exception e) {
+            UIUtils.showAlert("Ошибка", "Произошла ошибка: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
 
     private String formatDateTime(String dateTime) {
         try {
-            LocalDateTime parsedDateTime = LocalDateTime.parse(dateTime);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm");
-            return parsedDateTime.format(formatter);
+            return dateTime;
         } catch (Exception e) {
             return dateTime;
         }

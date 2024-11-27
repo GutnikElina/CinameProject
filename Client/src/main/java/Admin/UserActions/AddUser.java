@@ -12,12 +12,10 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 public class AddUser extends UserActionBase {
-    @FXML
-    private TextField usernameField, passwordField;
-    @FXML
-    private Button backButton;
-    @FXML
-    private ComboBox<String> roleComboBox;
+
+    @FXML private TextField usernameField, passwordField;
+    @FXML private Button backButton;
+    @FXML private ComboBox<String> roleComboBox;
 
     @FXML
     private void initialize() {

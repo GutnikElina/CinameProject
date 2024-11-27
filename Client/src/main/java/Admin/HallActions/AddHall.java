@@ -10,10 +10,10 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class AddHall extends HallActionBase {
+
     @FXML public Button addButton;
     @FXML private TextField hallField;
     @FXML private TextField capacityField;
-    @FXML private Button backButton;
 
     @FXML
     private void addHallAction() {
@@ -33,7 +33,7 @@ public class AddHall extends HallActionBase {
 
     @FXML
     private void handleBackButton() {
-        Stage stage = (Stage) backButton.getScene().getWindow();
+        Stage stage = (Stage) addButton.getScene().getWindow();
         stage.close();
     }
 }

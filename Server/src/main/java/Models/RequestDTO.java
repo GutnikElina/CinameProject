@@ -6,5 +6,5 @@ import java.util.Map;
 @Data
 public class RequestDTO {
     private String command;
-    private Map<String, String> data;
+    private Map<String, Object> data;
 }

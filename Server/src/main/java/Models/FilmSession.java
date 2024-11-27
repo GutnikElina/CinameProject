@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 public class FilmSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;                     // Уникальный идентификатор сеанса
+    private Integer id;                     // Уникальный идентификатор сеанса
 
     @Column(name = "movie_id", nullable = false)
-    private int movieId;                // Идентификатор фильма, который соответствует этому сеансу
+    private Integer movieId;                // Идентификатор фильма, который соответствует этому сеансу
 
     @Column(name = "hall_id", nullable = false)
-    private int hallId;                 // Идентификатор зала, в котором проходит сеанс
+    private Integer hallId;                 // Идентификатор зала, в котором проходит сеанс
 
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;    // Дата и время начала сеанса

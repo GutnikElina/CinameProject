@@ -1,24 +1,24 @@
 package Admin.TicketActions;
 
 import Utils.AppUtils;
+import Utils.GsonFactory;
 import Utils.UIUtils;
-import javafx.application.Application;
-import javafx.event.ActionEvent;
+import Models.RequestDTO;
+import Models.ResponseDTO;
+import com.google.gson.Gson;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.util.Map;
 
 public class DeleteTicket {
 
-    @FXML
-    private TextField ticketIdField;
-    @FXML
-    private Button backButton;
+    @FXML private TextField ticketIdField;
+    @FXML private Button backButton;
+    private final Gson gson = GsonFactory.create();
 
     @FXML
     private void deleteTicketAction() {
@@ -30,18 +30,21 @@ public class DeleteTicket {
             }
 
             int ticketId = Integer.parseInt(ticketIdStr);
+            RequestDTO requestDTO = new RequestDTO();
+            requestDTO.setCommand("TICKET;DELETE");
+            requestDTO.setData(Map.of("ticketId", String.valueOf(ticketId)));
+            String requestJson = gson.toJson(requestDTO);
+            String responseJson = AppUtils.sendJsonCommandToServer(requestJson);
+            ResponseDTO response = gson.fromJson(responseJson, ResponseDTO.class);
 
-            String deleteTicketCommand = String.format("TICKET;DELETE;%d", ticketId);
-            String response = AppUtils.sendToServer(deleteTicketCommand);
-
-            if (response.startsWith("SUCCESS")) {
+            if ("SUCCESS".equals(response.getStatus())) {
                 UIUtils.showAlert("Успех", "Билет удален", Alert.AlertType.INFORMATION);
                 handleBackButton();
-            } else if (response.equals("TICKET_NOT_FOUND")) {
+            } else if ("TICKET_NOT_FOUND".equals(response.getStatus())) {
                 UIUtils.showAlert("Ошибка", "Билет с таким ID не найден", Alert.AlertType.ERROR);
                 handleBackButton();
             } else {
-                UIUtils.showAlert("Ошибка", "Не удалось удалить билет: " + response, Alert.AlertType.ERROR);
+                UIUtils.showAlert("Ошибка", "Не удалось удалить билет: " + response.getMessage(), Alert.AlertType.ERROR);
                 handleBackButton();
             }
 

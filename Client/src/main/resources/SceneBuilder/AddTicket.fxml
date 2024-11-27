@@ -43,12 +43,6 @@
         </Label>
         <TextField fx:id="seatNumberField" prefHeight="41.0" prefWidth="282.0" promptText="Введите номер места" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-        <Label alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="281.0" text="Цена билета:" GridPane.columnIndex="0" GridPane.rowIndex="3">
-            <font>
-                <Font name="Segoe UI Semibold" size="14.0" />
-            </font>
-        </Label>
-        <TextField fx:id="priceField" prefHeight="35.0" prefWidth="282.0" promptText="Введите цену билета" GridPane.columnIndex="1" GridPane.rowIndex="3" />
         <Label alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="281.0" text="Статус билета:" GridPane.columnIndex="0" GridPane.rowIndex="4">
             <font>
                 <Font name="Segoe UI Semibold" size="14.0" />

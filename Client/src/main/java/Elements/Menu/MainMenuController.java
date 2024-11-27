@@ -5,10 +5,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
 public class MainMenuController {
-    @FXML
-    private Button loginButton;
-    @FXML
-    private Button registerButton;
+    @FXML private Button loginButton;
+    @FXML private Button registerButton;
 
     @FXML
     public void initialize() {

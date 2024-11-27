@@ -1,8 +1,9 @@
 package Elements.Form;
 
 import MainApp.MainApp;
-import Utils.AppUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import Utils.GsonFactory;
+import Utils.UIUtils;
+import com.google.gson.Gson;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -10,16 +11,15 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import Models.RequestDTO;
-
 import java.util.Map;
 
 public class LoginForm {
+
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Button loginButton;
     @FXML private Button backButton;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Gson gson = GsonFactory.create();
 
     @FXML
     private void initialize() {
@@ -36,7 +36,7 @@ public class LoginForm {
         String password = passwordField.getText();
 
         if (username.isEmpty() || password.isEmpty()) {
-            AppUtils.showAlert("Ошибка", "Логин и пароль не должны быть пустыми.", Alert.AlertType.ERROR);
+            UIUtils.showAlert("Ошибка", "Логин и пароль не должны быть пустыми.", Alert.AlertType.ERROR);
             return;
         }
 
@@ -45,11 +45,11 @@ public class LoginForm {
             request.setCommand("LOGIN");
             request.setData(Map.of("username", username, "password", password));
 
-            String jsonRequest = objectMapper.writeValueAsString(request);
+            String jsonRequest = gson.toJson(request);
 
             MainApp.getInstance().getServerConnection().sendMessage(jsonRequest);
         } catch (Exception e) {
-            AppUtils.showAlert("Ошибка", "Не удалось отправить запрос: " + e.getMessage(), Alert.AlertType.ERROR);
+            UIUtils.showAlert("Ошибка", "Не удалось отправить запрос: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 }

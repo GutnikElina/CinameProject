@@ -2,10 +2,8 @@ package Handlers;
 
 import Services.AuthService;
 import Models.RequestDTO;
-import Models.ResponseDTO;
+import Utils.ResponseUtil;
 import lombok.AllArgsConstructor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.PrintWriter;
 import java.util.Map;
 
@@ -13,36 +11,26 @@ import java.util.Map;
 public class LoginHandler implements CommandHandler {
 
     private final AuthService authService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void handle(RequestDTO request, PrintWriter out) {
         try {
-            String username = request.getData().get("username");
-            String password = request.getData().get("password");
+            Map<String, Object> data = request.getData();
+
+            String username = (String) data.get("username");
+            String password = (String) data.get("password");
 
             String[] loginResponse = authService.login(username, password);
             if (loginResponse != null) {
-                ResponseDTO response = new ResponseDTO("LOGIN_SUCCESS", null, Map.of(
+                ResponseUtil.sendSuccess(out, "LOGIN_SUCCESS", Map.of(
                         "token", loginResponse[0],
                         "userRole", loginResponse[1]
                 ));
-                out.println(objectMapper.writeValueAsString(response));
             } else {
-                ResponseDTO response = new ResponseDTO("LOGIN_FAILED", "Неверный логин или пароль", null);
-                out.println(objectMapper.writeValueAsString(response));
+                ResponseUtil.sendError(out, "Неверный логин или пароль");
             }
         } catch (Exception e) {
-            sendError(out, "Ошибка обработки запроса: " + e.getMessage());
-        }
-    }
-
-    private void sendError(PrintWriter out, String message) {
-        try {
-            ResponseDTO errorResponse = new ResponseDTO("ERROR", message, null);
-            out.println(objectMapper.writeValueAsString(errorResponse));
-        } catch (Exception e) {
-            e.printStackTrace();
+            ResponseUtil.sendError(out, "Ошибка обработки запроса: " + e.getMessage());
         }
     }
 }

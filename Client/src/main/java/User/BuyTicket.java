@@ -71,7 +71,7 @@ public class BuyTicket {
 
     private void checkTicketAvailabilityWithServer(int sessionId, String seatNumber) {
         String checkTicketCommand = String.format("TICKET;CHECK;%d;%s", sessionId, seatNumber);
-        String checkResponse = AppUtils.sendToServer(checkTicketCommand);
+        String checkResponse = AppUtils.sendJsonCommandToServer(checkTicketCommand);
         if (checkResponse.startsWith("TICKET_NOT_EXISTS")) {
             UIUtils.showAlert("Доступно", "Место доступно для покупки.", Alert.AlertType.INFORMATION);
         } else if (checkResponse.startsWith("TICKET_EXISTS")) {
@@ -101,7 +101,7 @@ public class BuyTicket {
             }
 
             String buyTicketCommand = String.format("TICKET;ADD;%d;%s;%d;%s;PENDING;PURCHASE", sessionId, seatNumber, userId, price);
-            String response = AppUtils.sendToServer(buyTicketCommand);
+            String response = AppUtils.sendJsonCommandToServer(buyTicketCommand);
             if (response.startsWith("SUCCESS")) {
                 UIUtils.showAlert("Успех", "Билет успешно куплен.", Alert.AlertType.INFORMATION);
             } else {
@@ -112,7 +112,7 @@ public class BuyTicket {
 
     private boolean checkIfTicketOccupied(int sessionId, String seatNumber) {
         String checkTicketCommand = String.format("TICKET;CHECK;%d;%s", sessionId, seatNumber);
-        String checkResponse = AppUtils.sendToServer(checkTicketCommand);
+        String checkResponse = AppUtils.sendJsonCommandToServer(checkTicketCommand);
         if (checkResponse.startsWith("TICKET_EXISTS")) {
             UIUtils.showAlert("Занято", "Место уже занято.", Alert.AlertType.WARNING);
             return true;
@@ -143,7 +143,7 @@ public class BuyTicket {
     }
 
     private BigDecimal getSessionPrice(int sessionId) {
-        String sessionResponse = AppUtils.sendToServer(String.format("SESSION;GET;%d", sessionId));
+        String sessionResponse = AppUtils.sendJsonCommandToServer(String.format("SESSION;GET;%d", sessionId));
         if (!sessionResponse.startsWith("SESSION_FOUND")) {
             showErrorAlert("Сеанс не найден", sessionResponse);
             return null;
@@ -159,7 +159,7 @@ public class BuyTicket {
     }
 
     private int getHallCapacity(int sessionId) {
-        String sessionResponse = AppUtils.sendToServer(String.format("SESSION;GET;%d", sessionId));
+        String sessionResponse = AppUtils.sendJsonCommandToServer(String.format("SESSION;GET;%d", sessionId));
         if (!sessionResponse.startsWith("SESSION_FOUND")) {
             showErrorAlert("Сеанс не найден", sessionResponse);
             return 0;
@@ -167,7 +167,7 @@ public class BuyTicket {
 
         String[] sessionParts = sessionResponse.split(";");
         String hallName = sessionParts[3];
-        String hallResponse = AppUtils.sendToServer(String.format("HALL;GET;%s", hallName));
+        String hallResponse = AppUtils.sendJsonCommandToServer(String.format("HALL;GET;%s", hallName));
 
         if (hallResponse.startsWith("HALL_FOUND")) {
             String[] hallParts = hallResponse.split(";");

@@ -71,7 +71,6 @@ public class ConfirmTicket {
                         ticket.setSessionId(Integer.parseInt(parts[2]));
                         ticket.setSeatNumber(parts[3]);
                         ticket.setUserId(Integer.parseInt(parts[4]));
-                        ticket.setPrice(BigDecimal.valueOf(Double.parseDouble(parts[5])));
                         ticket.setStatus(parts[6]);
                         ticket.setRequestType(parts[7]);
                         ticket.setPurchaseTime(parseDate(parts[8]));
@@ -85,7 +84,7 @@ public class ConfirmTicket {
     }
 
     private void confirmTicket(Ticket ticket) {
-        String confirmResponse = AppUtils.sendToServer(String.format("TICKET;UPDATE;CONFIRM;%d", ticket.getId()));
+        String confirmResponse = AppUtils.sendJsonCommandToServer(String.format("TICKET;UPDATE;CONFIRM;%d", ticket.getId()));
         System.out.println(confirmResponse);
         if (confirmResponse.startsWith("SUCCESS")) {
             UIUtils.showAlert("Успех", "Билет подтвержден", Alert.AlertType.INFORMATION);

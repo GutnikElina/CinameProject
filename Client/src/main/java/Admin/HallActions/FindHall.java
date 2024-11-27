@@ -2,22 +2,26 @@ package Admin.HallActions;
 
 import Admin.GeneralActions.HallActionBase;
 import Models.Hall;
-import Utils.AppUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import javafx.scene.control.Alert;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Button;
-import javafx.stage.Stage;
 import Models.RequestDTO;
 import Models.ResponseDTO;
+import Utils.AppUtils;
+import Utils.GsonFactory;
+import Utils.UIUtils;
+import com.google.gson.Gson;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+
 import java.util.Map;
 
 public class FindHall extends HallActionBase {
     @FXML private TextField hallIdField;
     @FXML private Label nameLabel, capacityLabel;
     @FXML private Button backButton;
+    private final Gson gson = GsonFactory.create();
 
     @FXML
     private void fetchHallDetails() {
@@ -25,38 +29,25 @@ public class FindHall extends HallActionBase {
             int hallId = Integer.parseInt(hallIdField.getText());
             sendHallFindRequest(hallId);
         } catch (NumberFormatException e) {
-            AppUtils.showAlert("Ошибка", "Введите корректный ID зала!", Alert.AlertType.INFORMATION);
+            UIUtils.showAlert("Ошибка", "Введите корректный ID зала!", Alert.AlertType.INFORMATION);
         }
     }
 
     private void sendHallFindRequest(int hallId) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            RequestDTO request = new RequestDTO();
-            request.setCommand("HALL;GET");
-            request.setData(Map.of("id", String.valueOf(hallId)));
+            RequestDTO request = new RequestDTO("HALL;GET", Map.of("id", String.valueOf(hallId)));
+            String jsonRequest = gson.toJson(request);
+            String response = AppUtils.sendJsonCommandToServer(jsonRequest);
+            ResponseDTO responseDTO = gson.fromJson(response, ResponseDTO.class);
 
-            String jsonRequest = objectMapper.writeValueAsString(request);
-
-            String response = AppUtils.sendToServer(jsonRequest);
-
-            if (response.contains("ERROR")) {
-                AppUtils.showAlert("Ошибка", "Зал не найден.", Alert.AlertType.INFORMATION);
+            if ("HALL_FOUND".equals(responseDTO.getStatus())) {
+                Hall hall = gson.fromJson(gson.toJson(responseDTO.getData().get("hall")), Hall.class);
+                updateHallDetails(hall);
             } else {
-                ResponseDTO responseDTO = objectMapper.readValue(response, ResponseDTO.class);
-                if ("HALL_FOUND".equals(responseDTO.getStatus())) {
-                    Map<String, Object> data = responseDTO.getData();
-                    Hall hall = new Hall();
-                    hall.setId((Integer) data.get("id"));
-                    hall.setName((String) data.get("name"));
-                    hall.setCapacity((Integer) data.get("capacity"));
-                    updateHallDetails(hall);
-                } else {
-                    AppUtils.showAlert("Ошибка", responseDTO.getMessage(), Alert.AlertType.INFORMATION);
-                }
+                UIUtils.showAlert("Ошибка", "Зал не найден.", Alert.AlertType.INFORMATION);
             }
         } catch (Exception e) {
-            AppUtils.showAlert("Ошибка", "Не удалось отправить запрос на сервер: " + e.getMessage(), Alert.AlertType.ERROR);
+            UIUtils.showAlert("Ошибка", "Не удалось отправить запрос на сервер: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 

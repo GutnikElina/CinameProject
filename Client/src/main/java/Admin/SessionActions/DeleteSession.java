@@ -1,20 +1,24 @@
 package Admin.SessionActions;
 
+import Models.RequestDTO;
+import Models.ResponseDTO;
 import Utils.AppUtils;
+import Utils.GsonFactory;
 import Utils.UIUtils;
+import com.google.gson.Gson;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
+import java.util.Map;
 
 public class DeleteSession {
 
-    @FXML
-    private TextField sessionIdField;
-    @FXML
-    private Button backButton;
+    @FXML private TextField sessionIdField;
+    @FXML private Button backButton;
+    private final Gson gson = GsonFactory.create();
 
     @FXML
     private void deleteSessionAction() {
@@ -27,18 +31,21 @@ public class DeleteSession {
 
             int sessionId = Integer.parseInt(sessionIdStr);
 
-            String deleteSessionCommand = String.format("SESSION;DELETE;%d", sessionId);
-            String response = AppUtils.sendToServer(deleteSessionCommand);
+            RequestDTO requestDTO = new RequestDTO();
+            requestDTO.setCommand("SESSION;DELETE");
+            requestDTO.setData(Map.of("sessionId", String.valueOf(sessionId)));
+            String jsonRequest = gson.toJson(requestDTO);
 
-            if (response.startsWith("SUCCESS")) {
-                UIUtils.showAlert("Успех", "Сеанс удален", Alert.AlertType.INFORMATION);
-                closeStage();
-            } else if (response.equals("SESSION_NOT_FOUND")) {
+            String jsonResponse = AppUtils.sendJsonCommandToServer(jsonRequest);
+            ResponseDTO response = gson.fromJson(jsonResponse, ResponseDTO.class);
+
+            if ("SUCCESS".equals(response.getStatus())) {
+                UIUtils.showAlert("Успех", response.getMessage(), Alert.AlertType.INFORMATION);
+                handleBackButton();
+            } else if ("SESSION_NOT_FOUND".equals(response.getStatus())) {
                 UIUtils.showAlert("Ошибка", "Сеанс с таким ID не найден", Alert.AlertType.ERROR);
-                closeStage();
             } else {
-                UIUtils.showAlert("Ошибка", "Не удалось удалить сеанс: " + response, Alert.AlertType.ERROR);
-                closeStage();
+                UIUtils.showAlert("Ошибка", response.getMessage(), Alert.AlertType.ERROR);
             }
 
         } catch (NumberFormatException e) {
@@ -49,11 +56,7 @@ public class DeleteSession {
     }
 
     @FXML
-    private void handleBackButton(ActionEvent event) {
-        closeStage();
-    }
-
-    private void closeStage() {
+    private void handleBackButton() {
         Stage stage = (Stage) sessionIdField.getScene().getWindow();
         stage.close();
     }

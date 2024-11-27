@@ -8,11 +8,9 @@ import javafx.stage.Stage;
 import lombok.Getter;
 
 public class MainApp extends Application {
-    @Getter
-    private static MainApp instance;
 
-    @Getter
-    private ServerConnection serverConnection;
+    @Getter private static MainApp instance;
+    @Getter private ServerConnection serverConnection;
 
     @Override
     public void start(Stage primaryStage) {

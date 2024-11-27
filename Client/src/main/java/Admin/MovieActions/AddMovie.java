@@ -8,7 +8,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class AddMovie extends MovieActionBase {
     @FXML private TextField titleField, genreField, durationField;
@@ -48,7 +47,7 @@ public class AddMovie extends MovieActionBase {
 
         LocalDate releaseDate = releaseDatePicker.getValue();
         if (releaseDate != null) {
-            movie.setReleaseDate(releaseDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
+            movie.setReleaseDate(releaseDate.toString());
         }
 
         movie.setDescription(descriptionField.getText());
